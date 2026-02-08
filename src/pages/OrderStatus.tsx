@@ -7,6 +7,7 @@ import { OrderStatusTracker } from '@/components/order/OrderStatusTracker';
 import { useStoreConfig } from '@/hooks/useStore';
 import { useOrderWithItems } from '@/hooks/useOrders';
 import { supabase } from '@/integrations/supabase/client';
+import { useCart } from '@/hooks/useCart';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -14,7 +15,9 @@ const OrderStatus = () => {
   const { id, slug } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const basePath = slug ? `/r/${slug}` : '';
+  const { restaurantSlug } = useCart();
+  const effectiveSlug = slug || restaurantSlug;
+  const basePath = effectiveSlug ? `/r/${effectiveSlug}` : '';
   const { data: store } = useStoreConfig();
   const { order, items, isLoading, error } = useOrderWithItems(Number(id));
   const [isRefreshing, setIsRefreshing] = useState(false);
