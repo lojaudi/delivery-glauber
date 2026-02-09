@@ -169,6 +169,44 @@ export type Database = {
           },
         ]
       }
+      communication_logs: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          restaurant_id: string
+          sent_at: string
+          sent_by: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          restaurant_id: string
+          sent_at?: string
+          sent_by: string
+          type?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          restaurant_id?: string
+          sent_at?: string
+          sent_by?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_logs_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           code: string
@@ -692,6 +730,8 @@ export type Database = {
           delivery_time_min: number
           id: string
           is_open: boolean
+          kitchen_pin: string | null
+          kitchen_pin_enabled: boolean
           logo_url: string | null
           min_order_value: number
           msg_order_accepted: string | null
@@ -722,6 +762,8 @@ export type Database = {
           delivery_time_min?: number
           id?: string
           is_open?: boolean
+          kitchen_pin?: string | null
+          kitchen_pin_enabled?: boolean
           logo_url?: string | null
           min_order_value?: number
           msg_order_accepted?: string | null
@@ -752,6 +794,8 @@ export type Database = {
           delivery_time_min?: number
           id?: string
           is_open?: boolean
+          kitchen_pin?: string | null
+          kitchen_pin_enabled?: boolean
           logo_url?: string | null
           min_order_value?: number
           msg_order_accepted?: string | null
