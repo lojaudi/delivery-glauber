@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { PinPad } from '@/components/auth/PinPad';
 import { useStoreConfig } from '@/hooks/useStore';
 import { useTheme } from '@/hooks/useTheme';
-import { supabase } from '@/integrations/supabase/client';
+
 
 export default function KitchenLogin() {
   const navigate = useNavigate();
@@ -23,63 +23,66 @@ export default function KitchenLogin() {
   }, [store]);
 
   const checkPinRequired = async () => {
-    if (!store?.id) return;
+    if (!store?.id || !store?.restaurant_id) return;
     
     // Check if already authenticated
     const savedAuth = localStorage.getItem(`kitchen_auth_${store.id}`);
     if (savedAuth) {
       const authData = JSON.parse(savedAuth);
-      // Session valid for 24 hours
       if (Date.now() - authData.timestamp < 24 * 60 * 60 * 1000) {
         navigate(`/r/${slug}/kitchen`);
         return;
       }
     }
     
-    const { data, error } = await supabase
-      .from('store_config')
-      .select('kitchen_pin_enabled')
-      .eq('id', store.id)
-      .single();
-    
-    if (!error && data) {
-      if (!data.kitchen_pin_enabled) {
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/verify-kitchen-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurantId: store.restaurant_id }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && !result.pinRequired) {
         // No PIN required, go directly to kitchen
         navigate(`/r/${slug}/kitchen`);
       } else {
         setPinRequired(true);
       }
+    } catch {
+      setPinRequired(true);
     }
   };
 
   const handlePinSubmit = async (pin: string) => {
-    if (!store?.id) return;
+    if (!store?.id || !store?.restaurant_id) return;
     
     setIsVerifying(true);
     setError('');
     
     try {
-      const { data, error: queryError } = await supabase
-        .from('store_config')
-        .select('kitchen_pin')
-        .eq('id', store.id)
-        .single();
-      
-      if (queryError) throw queryError;
-      
-      if (data?.kitchen_pin === pin) {
-        // Save session
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/verify-kitchen-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ restaurantId: store.restaurant_id, pin }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         localStorage.setItem(`kitchen_auth_${store.id}`, JSON.stringify({
           timestamp: Date.now(),
           authenticated: true
         }));
-        
         navigate(`/r/${slug}/kitchen`);
       } else {
-        setError('PIN incorreto. Tente novamente.');
+        setError(result.error || 'PIN incorreto. Tente novamente.');
       }
-    } catch (err) {
-      setError('Erro ao verificar PIN');
+    } catch {
+      setError('Erro ao verificar PIN. Tente novamente.');
     } finally {
       setIsVerifying(false);
     }
