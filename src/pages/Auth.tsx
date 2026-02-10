@@ -219,6 +219,32 @@ const Auth = () => {
         return;
       }
 
+      // Send branded welcome email via Resend
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        await fetch(`${supabaseUrl}/functions/v1/send-auth-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: formData.email,
+            subject: 'Bem-vindo! Sua conta foi criada',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h1 style="color: #333; text-align: center;">Bem-vindo! 🎉</h1>
+                <p style="color: #555; font-size: 16px;">Sua conta foi criada com sucesso.</p>
+                <p style="color: #555; font-size: 16px;">Agora você pode acessar o painel administrativo para gerenciar seu restaurante.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${window.location.origin}/auth" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 16px;">Acessar Painel</a>
+                </div>
+                <p style="color: #999; font-size: 12px; text-align: center;">Se você não criou esta conta, ignore este email.</p>
+              </div>
+            `,
+          }),
+        });
+      } catch (emailError) {
+        console.error('Error sending welcome email:', emailError);
+      }
+
       toast({
         title: 'Conta criada!',
         description: 'Sua conta foi criada com sucesso. Você já pode fazer login.',
