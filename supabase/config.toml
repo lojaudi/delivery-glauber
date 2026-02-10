@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.verify-waiter-pin]
 verify_jwt = false
+
+[functions.verify-kitchen-pin]
+verify_jwt = false
