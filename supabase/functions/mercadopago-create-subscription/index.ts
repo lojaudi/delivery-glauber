@@ -1,42 +1,83 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-    const { restaurantId, payerEmail, resellerId } = await req.json();
-
-    if (!restaurantId || !payerEmail || !resellerId) {
+    // Authenticate the caller
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: restaurantId, payerEmail, resellerId' }),
+        JSON.stringify({ error: 'Não autorizado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: 'Token inválido' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const userId = claimsData.claims.sub;
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    // Verify user is an active reseller
+    const { data: reseller, error: resellerError } = await supabaseAdmin
+      .from('resellers')
+      .select('id, mp_access_token, mp_integration_enabled')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .single();
+
+    if (resellerError || !reseller) {
+      return new Response(
+        JSON.stringify({ error: 'Acesso restrito a revendedores' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { restaurantId, payerEmail } = await req.json();
+
+    if (!restaurantId || !payerEmail) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: restaurantId, payerEmail' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get reseller's Mercado Pago credentials
-    const { data: reseller, error: resellerError } = await supabaseClient
-      .from('resellers')
-      .select('mp_access_token, mp_integration_enabled')
-      .eq('id', resellerId)
+    // Verify restaurant belongs to this reseller
+    const { data: restaurant, error: restaurantError } = await supabaseAdmin
+      .from('restaurants')
+      .select('id, name, monthly_fee, slug')
+      .eq('id', restaurantId)
+      .eq('reseller_id', reseller.id)
       .single();
 
-    if (resellerError || !reseller) {
-      console.error('Error fetching reseller:', resellerError);
+    if (restaurantError || !restaurant) {
       return new Response(
-        JSON.stringify({ error: 'Reseller not found' }),
+        JSON.stringify({ error: 'Restaurante não encontrado ou não pertence a este revendedor' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -45,21 +86,6 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Mercado Pago integration not configured for this reseller' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Get restaurant details
-    const { data: restaurant, error: restaurantError } = await supabaseClient
-      .from('restaurants')
-      .select('id, name, monthly_fee, slug')
-      .eq('id', restaurantId)
-      .single();
-
-    if (restaurantError || !restaurant) {
-      console.error('Error fetching restaurant:', restaurantError);
-      return new Response(
-        JSON.stringify({ error: 'Restaurant not found' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -74,7 +100,7 @@ serve(async (req) => {
         transaction_amount: Number(restaurant.monthly_fee),
         currency_id: 'BRL'
       },
-      back_url: `${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '.lovable.app')}/reseller/restaurants/${restaurant.id}`,
+      back_url: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reseller/restaurants/${restaurant.id}`,
       status: 'pending'
     };
 
@@ -101,7 +127,7 @@ serve(async (req) => {
     }
 
     // Update restaurant with subscription info
-    const { error: updateError } = await supabaseClient
+    const { error: updateError } = await supabaseAdmin
       .from('restaurants')
       .update({
         mp_subscription_id: mpResult.id,
