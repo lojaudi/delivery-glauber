@@ -20,3 +20,15 @@ verify_jwt = false
 
 [functions.verify-kitchen-pin]
 verify_jwt = false
+
+[functions.mercadopago-create-subscription]
+verify_jwt = false
+
+[functions.mercadopago-cancel-subscription]
+verify_jwt = false
+
+[functions.mercadopago-landing-checkout]
+verify_jwt = false
+
+[functions.mercadopago-webhook]
+verify_jwt = false
