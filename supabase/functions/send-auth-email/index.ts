@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: from || "Autenticação <noreply@delivery-glauber.lovable.app>",
+      from: from || "Autenticação <noreply@deliery.scriptstore.top>",
       to: [to],
       subject,
       html,
