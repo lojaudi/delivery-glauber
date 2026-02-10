@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { 
   LogOut, 
@@ -18,7 +18,7 @@ import { WaiterTableCard } from '@/components/waiter/WaiterTableCard';
 import { TableOrderScreen } from '@/components/pdv/TableOrderScreen';
 import { TableCheckout } from '@/components/pdv/TableCheckout';
 import { OpenTableModal } from '@/components/pdv/OpenTableModal';
-import { useTablesWithOrders } from '@/hooks/useTables';
+import { useWaiterTablesWithOrders } from '@/hooks/useWaiterTables';
 import { useWaiterReadyItems, useKitchenItemMutations } from '@/hooks/useKitchenItems';
 import { useStoreConfig } from '@/hooks/useStore';
 import { useTheme } from '@/hooks/useTheme';
@@ -29,8 +29,9 @@ type WaiterView = 'tables' | 'order' | 'checkout';
 
 export default function WaiterDashboard() {
   const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
   const { data: store } = useStoreConfig();
-  const { tables, isLoading } = useTablesWithOrders();
+  const { tables, isLoading } = useWaiterTablesWithOrders();
   const { items: readyItems } = useWaiterReadyItems();
   const { updateItemStatus } = useKitchenItemMutations();
   
@@ -49,14 +50,14 @@ export default function WaiterDashboard() {
 
   useEffect(() => {
     if (!waiterId || !waiterName) {
-      navigate('/waiter');
+      navigate(slug ? `/r/${slug}/waiter` : '/waiter');
     }
-  }, [waiterId, waiterName, navigate]);
+  }, [waiterId, waiterName, navigate, slug]);
 
   const handleLogout = () => {
     localStorage.removeItem('waiter_id');
     localStorage.removeItem('waiter_name');
-    navigate('/waiter');
+    navigate(slug ? `/r/${slug}/waiter` : '/waiter');
   };
 
   const handleTableClick = (table: TableWithOrder) => {

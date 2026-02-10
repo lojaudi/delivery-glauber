@@ -32,14 +32,33 @@ export default function WaiterAccess() {
 
   useEffect(() => {
     loadWaiters();
-  }, []);
+  }, [slug]);
 
   const loadWaiters = async () => {
     setIsLoading(true);
+    
+    // First get restaurant_id from slug
+    if (!slug) {
+      setIsLoading(false);
+      return;
+    }
+
+    const { data: restaurant } = await supabase
+      .from('restaurants')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (!restaurant) {
+      setIsLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('waiters')
-      .select('*')
+      .select('id, name, phone, is_active, pin')
       .eq('is_active', true)
+      .eq('restaurant_id', restaurant.id)
       .order('name');
 
     if (!error && data) {
