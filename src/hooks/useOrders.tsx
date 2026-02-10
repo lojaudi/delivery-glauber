@@ -116,41 +116,73 @@ export function useOrderItems(orderId: number) {
 
 export function useOrderWithItems(orderId: number) {
   const { slug } = useParams<{ slug: string }>();
+  const isCustomerContext = !!slug;
   
   const orderQuery = useQuery({
     queryKey: ['order', orderId, slug],
     queryFn: async () => {
-      // First get the restaurant_id from slug if available
-      let restaurantId: string | null = null;
-      if (slug) {
-        const { data: restaurant } = await supabase
-          .from('restaurants')
-          .select('id')
-          .eq('slug', slug)
-          .maybeSingle();
-        restaurantId = restaurant?.id || null;
+      if (isCustomerContext) {
+        // Customer context: use secure edge function
+        let restaurantId: string | null = null;
+        if (slug) {
+          const { data: restaurant } = await supabase
+            .from('restaurants')
+            .select('id')
+            .eq('slug', slug)
+            .maybeSingle();
+          restaurantId = restaurant?.id || null;
+        }
+
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const response = await fetch(`${supabaseUrl}/functions/v1/lookup-customer-orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'by_id', orderId, restaurantId }),
+        });
+
+        if (!response.ok) throw new Error('Pedido não encontrado');
+        const result = await response.json();
+        return result.order as Order;
+      } else {
+        // Admin context: use direct query (authenticated)
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('id', orderId)
+          .single();
+
+        if (error) throw error;
+        return data as Order;
       }
-
-      // Build query with optional restaurant filter
-      let query = supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderId);
-      
-      // If we have a restaurant context, validate ownership
-      if (restaurantId) {
-        query = query.eq('restaurant_id', restaurantId);
-      }
-
-      const { data, error } = await query.single();
-
-      if (error) throw error;
-      return data as Order;
     },
     enabled: !!orderId,
   });
 
-  const itemsQuery = useOrderItems(orderId);
+  const itemsQuery = useQuery({
+    queryKey: ['order-items', orderId, slug],
+    queryFn: async () => {
+      if (isCustomerContext) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const response = await fetch(`${supabaseUrl}/functions/v1/lookup-customer-orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'items', orderId }),
+        });
+
+        if (!response.ok) throw new Error('Itens não encontrados');
+        const result = await response.json();
+        return result.items as OrderItem[];
+      } else {
+        const { data, error } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', orderId);
+        if (error) throw error;
+        return data as OrderItem[];
+      }
+    },
+    enabled: !!orderId,
+  });
 
   return {
     order: orderQuery.data,

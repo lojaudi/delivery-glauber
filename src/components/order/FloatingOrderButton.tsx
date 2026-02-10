@@ -34,14 +34,22 @@ export function FloatingOrderButton({ orderId, onDismiss }: FloatingOrderButtonP
   useEffect(() => {
     // Check initial status
     const checkOrderStatus = async () => {
-      const { data } = await supabase
-        .from('orders')
-        .select('status')
-        .eq('id', orderId)
-        .single();
-      
-      if (data?.status === 'completed' || data?.status === 'cancelled') {
-        handleDismiss();
+      try {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const response = await fetch(`${supabaseUrl}/functions/v1/lookup-customer-orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mode: 'status', orderId }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.status === 'completed' || data?.status === 'cancelled') {
+            handleDismiss();
+          }
+        }
+      } catch {
+        // Ignore errors for status check
       }
     };
 
