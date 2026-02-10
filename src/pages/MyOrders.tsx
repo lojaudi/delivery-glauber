@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+
 import { useStoreConfig } from '@/hooks/useStore';
 import { useRestaurant } from '@/hooks/useRestaurant';
 interface Order {
@@ -58,15 +58,20 @@ export default function MyOrders() {
     setHasSearched(true);
     
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('customer_phone', phone)
-        .eq('restaurant_id', restaurant.id)
-        .order('created_at', { ascending: false });
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/lookup-customer-orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'by_phone',
+          customerPhone: phone,
+          restaurantId: restaurant.id,
+        }),
+      });
 
-      if (error) throw error;
-      setOrders(data || []);
+      if (!response.ok) throw new Error('Erro ao buscar pedidos');
+      const result = await response.json();
+      setOrders(result.orders || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
