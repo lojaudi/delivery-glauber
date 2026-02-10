@@ -169,6 +169,30 @@ const Auth = () => {
           variant: 'destructive',
         });
       } else {
+        // Send branded password reset notification via Resend
+        try {
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          await fetch(`${supabaseUrl}/functions/v1/send-auth-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: formData.email,
+              subject: 'Recuperação de Senha',
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <h1 style="color: #333; text-align: center;">Recuperação de Senha 🔐</h1>
+                  <p style="color: #555; font-size: 16px;">Recebemos uma solicitação para redefinir sua senha.</p>
+                  <p style="color: #555; font-size: 16px;">Verifique sua caixa de entrada — você receberá um link para criar uma nova senha.</p>
+                  <p style="color: #555; font-size: 16px;">Se você não solicitou a redefinição de senha, ignore este email. Sua conta permanece segura.</p>
+                  <p style="color: #999; font-size: 12px; text-align: center; margin-top: 30px;">Este é um email automático, não responda.</p>
+                </div>
+              `,
+            }),
+          });
+        } catch (emailError) {
+          console.error('Error sending reset email:', emailError);
+        }
+
         toast({
           title: 'Email enviado!',
           description: 'Verifique sua caixa de entrada para redefinir a senha.',
