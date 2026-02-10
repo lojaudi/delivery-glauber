@@ -9,21 +9,23 @@ import { useStoreConfig } from '@/hooks/useStore';
 import { useTheme } from '@/hooks/useTheme';
 import { supabase } from '@/integrations/supabase/client';
 
-interface Waiter {
+interface WaiterPublic {
   id: string;
   name: string;
   phone: string | null;
   is_active: boolean;
-  pin: string | null;
+  restaurant_id: string;
+  has_pin: boolean;
 }
 
 export default function WaiterAccess() {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const { data: store } = useStoreConfig();
-  const [waiters, setWaiters] = useState<Waiter[]>([]);
+  const [waiters, setWaiters] = useState<WaiterPublic[]>([]);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedWaiter, setSelectedWaiter] = useState<Waiter | null>(null);
+  const [selectedWaiter, setSelectedWaiter] = useState<WaiterPublic | null>(null);
   const [showPinPad, setShowPinPad] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [pinError, setPinError] = useState('');
@@ -37,7 +39,6 @@ export default function WaiterAccess() {
   const loadWaiters = async () => {
     setIsLoading(true);
     
-    // First get restaurant_id from slug
     if (!slug) {
       setIsLoading(false);
       return;
@@ -54,53 +55,104 @@ export default function WaiterAccess() {
       return;
     }
 
+    setRestaurantId(restaurant.id);
+
+    // Use waiters_public view (no PIN exposed)
     const { data, error } = await supabase
       .from('waiters')
-      .select('id, name, phone, is_active, pin')
+      .select('id, name, phone, is_active, restaurant_id')
       .eq('is_active', true)
       .eq('restaurant_id', restaurant.id)
       .order('name');
 
     if (!error && data) {
-      setWaiters(data);
+      // We don't know if they have PIN from the public view, so assume they might
+      // The server will handle PIN verification
+      setWaiters(data.map(w => ({ ...w, has_pin: true })));
     }
     setIsLoading(false);
   };
 
-  const handleSelectWaiter = (waiter: Waiter) => {
+  const handleSelectWaiter = (waiter: WaiterPublic) => {
     setSelectedWaiter(waiter);
     setPinError('');
-    
-    // If waiter has PIN, show PIN pad
-    if (waiter.pin) {
-      setShowPinPad(true);
-    } else {
-      // No PIN configured, allow direct access
-      completeLogin(waiter.id, waiter.name);
-    }
+    // Always show PIN pad - server will handle no-PIN case
+    setShowPinPad(true);
   };
 
   const handlePinSubmit = async (pin: string) => {
-    if (!selectedWaiter) return;
+    if (!selectedWaiter || !restaurantId) return;
     
     setIsVerifying(true);
     setPinError('');
     
-    // Verify PIN
-    if (selectedWaiter.pin === pin) {
-      completeLogin(selectedWaiter.id, selectedWaiter.name);
-    } else {
-      setPinError('PIN incorreto. Tente novamente.');
+    try {
+      // Server-side PIN verification
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/verify-waiter-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          waiterId: selectedWaiter.id,
+          pin,
+          restaurantId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        completeLogin(result.waiterId, result.waiterName);
+      } else {
+        setPinError(result.error || 'PIN incorreto. Tente novamente.');
+        setIsVerifying(false);
+      }
+    } catch (error) {
+      setPinError('Erro ao verificar PIN. Tente novamente.');
+      setIsVerifying(false);
+    }
+  };
+
+  const handleDirectAccess = async (waiter: WaiterPublic) => {
+    if (!restaurantId) return;
+    
+    setIsVerifying(true);
+    
+    try {
+      // Try server-side access without PIN
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/verify-waiter-pin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          waiterId: waiter.id,
+          restaurantId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        completeLogin(result.waiterId, result.waiterName);
+      } else if (response.status === 401) {
+        // PIN required - show PIN pad
+        setSelectedWaiter(waiter);
+        setShowPinPad(true);
+        setIsVerifying(false);
+      } else {
+        setPinError(result.error || 'Erro ao acessar');
+        setIsVerifying(false);
+      }
+    } catch (error) {
+      setPinError('Erro de conexão');
       setIsVerifying(false);
     }
   };
 
   const completeLogin = (waiterId: string, waiterName: string) => {
-    // Store waiter info in localStorage
     localStorage.setItem('waiter_id', waiterId);
     localStorage.setItem('waiter_name', waiterName);
     
-    // Navigate to dashboard with slug
     setTimeout(() => {
       navigate(`/r/${slug}/waiter/dashboard`);
     }, 300);
@@ -202,10 +254,10 @@ export default function WaiterAccess() {
                     key={waiter.id}
                     variant="outline"
                     className="w-full h-14 text-lg justify-start px-4"
-                    onClick={() => handleSelectWaiter(waiter)}
-                    disabled={selectedWaiter !== null && !showPinPad}
+                    onClick={() => handleDirectAccess(waiter)}
+                    disabled={isVerifying}
                   >
-                    {selectedWaiter?.id === waiter.id && !showPinPad ? (
+                    {isVerifying && selectedWaiter?.id === waiter.id ? (
                       <Loader2 className="h-5 w-5 mr-3 animate-spin" />
                     ) : (
                       <UserCheck className="h-5 w-5 mr-3" />

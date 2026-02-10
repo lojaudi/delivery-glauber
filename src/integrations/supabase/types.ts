@@ -716,6 +716,13 @@ export type Database = {
             referencedRelation: "resellers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "restaurants_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       store_config: {
@@ -927,6 +934,13 @@ export type Database = {
             columns: ["reseller_id"]
             isOneToOne: false
             referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_plans_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1153,7 +1167,199 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      resellers_public: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          landing_page_email: string | null
+          landing_page_enabled: boolean | null
+          landing_page_logo: string | null
+          landing_page_subtitle: string | null
+          landing_page_title: string | null
+          landing_page_whatsapp: string | null
+          name: string | null
+          phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          slug: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          landing_page_email?: string | null
+          landing_page_enabled?: boolean | null
+          landing_page_logo?: string | null
+          landing_page_subtitle?: string | null
+          landing_page_title?: string | null
+          landing_page_whatsapp?: string | null
+          name?: string | null
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string | null
+          landing_page_email?: string | null
+          landing_page_enabled?: boolean | null
+          landing_page_logo?: string | null
+          landing_page_subtitle?: string | null
+          landing_page_title?: string | null
+          landing_page_whatsapp?: string | null
+          name?: string | null
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          slug?: string | null
+        }
+        Relationships: []
+      }
+      store_config_public: {
+        Row: {
+          accent_color: string | null
+          address: string | null
+          cover_url: string | null
+          created_at: string | null
+          delivery_fee: number | null
+          delivery_fee_mode: string | null
+          delivery_time_max: number | null
+          delivery_time_min: number | null
+          id: string | null
+          is_open: boolean | null
+          kitchen_pin_enabled: boolean | null
+          logo_url: string | null
+          min_order_value: number | null
+          msg_order_accepted: string | null
+          msg_order_completed: string | null
+          msg_order_delivery: string | null
+          msg_order_preparing: string | null
+          name: string | null
+          phone_whatsapp: string | null
+          pix_key: string | null
+          pix_key_type: string | null
+          pix_message: string | null
+          primary_color: string | null
+          pwa_name: string | null
+          pwa_short_name: string | null
+          restaurant_id: string | null
+          secondary_color: string | null
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          address?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          delivery_fee_mode?: string | null
+          delivery_time_max?: number | null
+          delivery_time_min?: number | null
+          id?: string | null
+          is_open?: boolean | null
+          kitchen_pin_enabled?: boolean | null
+          logo_url?: string | null
+          min_order_value?: number | null
+          msg_order_accepted?: string | null
+          msg_order_completed?: string | null
+          msg_order_delivery?: string | null
+          msg_order_preparing?: string | null
+          name?: string | null
+          phone_whatsapp?: string | null
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_message?: string | null
+          primary_color?: string | null
+          pwa_name?: string | null
+          pwa_short_name?: string | null
+          restaurant_id?: string | null
+          secondary_color?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          address?: string | null
+          cover_url?: string | null
+          created_at?: string | null
+          delivery_fee?: number | null
+          delivery_fee_mode?: string | null
+          delivery_time_max?: number | null
+          delivery_time_min?: number | null
+          id?: string | null
+          is_open?: boolean | null
+          kitchen_pin_enabled?: boolean | null
+          logo_url?: string | null
+          min_order_value?: number | null
+          msg_order_accepted?: string | null
+          msg_order_completed?: string | null
+          msg_order_delivery?: string | null
+          msg_order_preparing?: string | null
+          name?: string | null
+          phone_whatsapp?: string | null
+          pix_key?: string | null
+          pix_key_type?: string | null
+          pix_message?: string | null
+          primary_color?: string | null
+          pwa_name?: string | null
+          pwa_short_name?: string | null
+          restaurant_id?: string | null
+          secondary_color?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_config_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      waiters_public: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          name: string | null
+          phone: string | null
+          restaurant_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          name?: string | null
+          phone?: string | null
+          restaurant_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          name?: string | null
+          phone?: string | null
+          restaurant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waiters_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       can_manage_restaurant: {

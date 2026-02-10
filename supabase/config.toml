@@ -5,3 +5,15 @@ verify_jwt = false
 
 [functions.reset-user-password]
 verify_jwt = false
+
+[functions.create-restaurant-admin]
+verify_jwt = false
+
+[functions.get-admin-emails]
+verify_jwt = false
+
+[functions.setup-reseller]
+verify_jwt = false
+
+[functions.verify-waiter-pin]
+verify_jwt = false

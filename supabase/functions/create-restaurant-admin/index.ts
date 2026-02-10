@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 serve(async (req) => {
@@ -12,14 +12,52 @@ serve(async (req) => {
   }
 
   try {
+    // ===== AUTH CHECK =====
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    const callerUserId = claimsData.claims.sub;
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { email, password, restaurantId, isOwner } = await req.json();
+    // ===== AUTHORIZATION: Only resellers can create admins =====
+    const { data: reseller } = await supabaseAdmin
+      .from('resellers')
+      .select('id')
+      .eq('user_id', callerUserId)
+      .eq('is_active', true)
+      .maybeSingle();
 
-    console.log('Creating admin for restaurant:', restaurantId, 'email:', email);
+    if (!reseller) {
+      return new Response(
+        JSON.stringify({ error: 'Apenas revendedores podem criar administradores' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { email, password, restaurantId, isOwner } = await req.json();
 
     if (!email || !password || !restaurantId) {
       return new Response(
@@ -28,18 +66,24 @@ serve(async (req) => {
       );
     }
 
-    // Verify restaurant exists
+    // Verify restaurant belongs to this reseller
     const { data: restaurant, error: restaurantError } = await supabaseAdmin
       .from('restaurants')
-      .select('id, name')
+      .select('id, name, reseller_id')
       .eq('id', restaurantId)
       .single();
 
     if (restaurantError || !restaurant) {
-      console.error('Restaurant not found:', restaurantError);
       return new Response(
         JSON.stringify({ error: 'Restaurant not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (restaurant.reseller_id !== reseller.id) {
+      return new Response(
+        JSON.stringify({ error: 'Você não tem permissão para gerenciar este restaurante' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -50,10 +94,8 @@ serve(async (req) => {
     let userId: string;
 
     if (existingUser) {
-      console.log('User already exists, using existing user:', existingUser.id);
       userId = existingUser.id;
       
-      // Check if already admin of this restaurant
       const { data: existingAdmin } = await supabaseAdmin
         .from('restaurant_admins')
         .select('id')
@@ -68,16 +110,13 @@ serve(async (req) => {
         );
       }
     } else {
-      // Create new user
-      console.log('Creating new user');
       const { data: newUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        email_confirm: true, // Auto-confirm email
+        email_confirm: true,
       });
 
       if (createUserError) {
-        console.error('Error creating user:', createUserError);
         return new Response(
           JSON.stringify({ error: `Erro ao criar usuário: ${createUserError.message}` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -85,10 +124,8 @@ serve(async (req) => {
       }
 
       userId = newUser.user.id;
-      console.log('User created:', userId);
     }
 
-    // Add user as restaurant admin
     const { data: adminRecord, error: adminError } = await supabaseAdmin
       .from('restaurant_admins')
       .insert({
@@ -100,14 +137,11 @@ serve(async (req) => {
       .single();
 
     if (adminError) {
-      console.error('Error creating admin record:', adminError);
       return new Response(
         JSON.stringify({ error: `Erro ao vincular administrador: ${adminError.message}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    console.log('Admin created successfully:', adminRecord);
 
     return new Response(
       JSON.stringify({
@@ -120,7 +154,6 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Unexpected error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: errorMessage }),
