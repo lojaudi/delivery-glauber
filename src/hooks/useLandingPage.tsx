@@ -13,11 +13,12 @@ export function useLandingPageData(resellerSlug?: string) {
     queryFn: async (): Promise<LandingPageData> => {
       let reseller: Reseller | null = null;
 
+      const safeFields = 'id, name, company_name, slug, primary_color, secondary_color, landing_page_enabled, landing_page_title, landing_page_subtitle, landing_page_logo, landing_page_email, landing_page_whatsapp, phone, email, is_active, created_at, updated_at';
+
       if (resellerSlug) {
-        // Fetch reseller by slug
         const { data, error } = await supabase
           .from('resellers')
-          .select('*')
+          .select(safeFields)
           .eq('slug', resellerSlug)
           .eq('is_active', true)
           .single();
@@ -26,10 +27,9 @@ export function useLandingPageData(resellerSlug?: string) {
           reseller = data as Reseller;
         }
       } else {
-        // Fetch the first active reseller with landing page enabled
         const { data, error } = await supabase
           .from('resellers')
-          .select('*')
+          .select(safeFields)
           .eq('is_active', true)
           .eq('landing_page_enabled', true)
           .order('created_at', { ascending: true })

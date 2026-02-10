@@ -2,11 +2,10 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -16,57 +15,54 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
+      auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Check if any reseller already exists
+    // Check if any reseller already exists - this is the primary guard
     const { count, error: countError } = await supabaseAdmin
       .from('resellers')
       .select('*', { count: 'exact', head: true });
 
     if (countError) {
-      console.error('Error checking resellers:', countError);
       throw new Error('Erro ao verificar revendedores existentes');
     }
 
     if (count && count > 0) {
-      console.log('Reseller already exists, blocking setup');
       return new Response(
         JSON.stringify({ error: 'Sistema já configurado. Faça login com suas credenciais.' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get request body
+    // Only allow setup when no resellers exist (first-time setup)
     const { name, email, password, companyName, phone } = await req.json();
 
     if (!name || !email || !password) {
       return new Response(
         JSON.stringify({ error: 'Nome, email e senha são obrigatórios' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Creating new reseller user:', email);
+    // Double-check no reseller was created between the first check and now (race condition)
+    const { count: recheck } = await supabaseAdmin
+      .from('resellers')
+      .select('*', { count: 'exact', head: true });
 
-    // Create user in Supabase Auth
+    if (recheck && recheck > 0) {
+      return new Response(
+        JSON.stringify({ error: 'Sistema já configurado.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // Auto-confirm email
+      email_confirm: true,
     });
 
     if (userError) {
-      console.error('Error creating user:', userError);
       throw new Error(userError.message);
     }
 
@@ -74,9 +70,6 @@ Deno.serve(async (req) => {
       throw new Error('Erro ao criar usuário');
     }
 
-    console.log('User created successfully:', userData.user.id);
-
-    // Create reseller record
     const { data: resellerData, error: resellerError } = await supabaseAdmin
       .from('resellers')
       .insert({
@@ -91,13 +84,9 @@ Deno.serve(async (req) => {
       .single();
 
     if (resellerError) {
-      console.error('Error creating reseller:', resellerError);
-      // Try to delete the user if reseller creation fails
       await supabaseAdmin.auth.admin.deleteUser(userData.user.id);
       throw new Error('Erro ao criar registro de revendedor');
     }
-
-    console.log('Reseller created successfully:', resellerData.id);
 
     return new Response(
       JSON.stringify({ 
@@ -105,10 +94,7 @@ Deno.serve(async (req) => {
         message: 'Revendedor criado com sucesso',
         resellerId: resellerData.id 
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error: unknown) {
@@ -116,10 +102,7 @@ Deno.serve(async (req) => {
     console.error('Setup reseller error:', error);
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
