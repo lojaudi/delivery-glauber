@@ -3,6 +3,7 @@
   "short_name": "Cardápio",
   "description": "Cardápio digital e delivery - Faça seu pedido online",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f59e0b",

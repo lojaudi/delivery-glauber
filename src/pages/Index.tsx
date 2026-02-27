@@ -9,6 +9,7 @@ import { ProductModal } from '@/components/menu/ProductModal';
 import { CartButton } from '@/components/cart/CartButton';
 import { FloatingOrderButton, getLastOrderId } from '@/components/order/FloatingOrderButton';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
+import { DynamicManifest } from '@/components/pwa/DynamicManifest';
 import { useStoreConfig } from '@/hooks/useStore';
 import { useCategories } from '@/hooks/useCategories';
 import { useProducts, Product } from '@/hooks/useProducts';
@@ -187,6 +188,7 @@ const Index = () => {
 
   return (
     <>
+      <DynamicManifest />
       <Helmet>
         <title>{store.name} - Cardápio Digital</title>
         <meta name="description" content={`Peça online no ${store.name}. Lanches, bebidas e muito mais com entrega rápida.`} />
