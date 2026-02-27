@@ -19,6 +19,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
   const [formData, setFormData] = useState({
     name: '',
     logo_url: '',
+    cover_url: '',
     pwa_name: '',
     pwa_short_name: '',
   });
@@ -28,6 +29,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
       setFormData({
         name: store.name || '',
         logo_url: store.logo_url || '',
+        cover_url: store.cover_url || '',
         pwa_name: store.pwa_name || store.name || '',
         pwa_short_name: store.pwa_short_name || '',
       });
@@ -43,6 +45,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
         id: store.id,
         name: formData.name,
         logo_url: formData.logo_url || null,
+        cover_url: formData.cover_url || null,
         pwa_name: formData.pwa_name || formData.name,
         pwa_short_name: formData.pwa_short_name || formData.pwa_name?.slice(0, 12) || formData.name.slice(0, 12),
       });
@@ -87,6 +90,22 @@ export function BrandSettings({ className }: BrandSettingsProps) {
           />
           <p className="text-xs text-muted-foreground">
             Recomendado: imagem quadrada de pelo menos 512x512 pixels
+          </p>
+        </div>
+
+        {/* Cover / Banner */}
+        <div className="space-y-2">
+          <Label className="text-xs sm:text-sm text-muted-foreground">
+            Banner do Catálogo (imagem de capa)
+          </Label>
+          <ImageUpload
+            bucket="store-assets"
+            currentUrl={formData.cover_url}
+            onUpload={(url) => setFormData({ ...formData, cover_url: url })}
+            onRemove={() => setFormData({ ...formData, cover_url: '' })}
+          />
+          <p className="text-xs text-muted-foreground">
+            Recomendado: 800×400 pixels. Aparece no topo do cardápio digital.
           </p>
         </div>
 
