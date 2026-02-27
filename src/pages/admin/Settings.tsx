@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useDemoGuard } from '@/hooks/useDemoGuard';
+import { WhatsAppNotificationLogs } from '@/components/admin/WhatsAppNotificationLogs';
 
 const AdminSettings = () => {
   const { checkDemoMode, canWrite } = useDemoGuard();
@@ -528,6 +529,9 @@ const AdminSettings = () => {
               </> : 'Salvar Configurações'}
           </Button>
         </form>
+
+        {/* WhatsApp Notification Logs */}
+        <WhatsAppNotificationLogs />
 
         {/* Business Hours */}
         <div className="bg-card rounded-xl p-4 sm:p-6 shadow-card space-y-4">
