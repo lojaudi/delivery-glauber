@@ -1168,6 +1168,50 @@ export type Database = {
           },
         ]
       }
+      whatsapp_notification_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          instance_name: string
+          order_id: number
+          phone: string
+          restaurant_id: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          instance_name: string
+          order_id: number
+          phone: string
+          restaurant_id: string
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          instance_name?: string
+          order_id?: number
+          phone?: string
+          restaurant_id?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_notification_logs_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       resellers_public: {
