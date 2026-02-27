@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 import { useStoreConfig } from '@/hooks/useStore';
-import { useRestaurant } from '@/hooks/useRestaurant';
+import { useRestaurantBySlug } from '@/hooks/useRestaurant';
 interface Order {
   id: number;
   customer_name: string;
@@ -32,9 +32,9 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.R
 
 export default function MyOrders() {
   const { slug } = useParams<{ slug: string }>();
-  const basePath = slug ? `/r/${slug}` : '';
+  const basePath = slug ? `/r/${slug}` : '/';
   const { data: store } = useStoreConfig();
-  const { restaurant } = useRestaurant();
+  const { data: restaurant } = useRestaurantBySlug(slug);
   const [phone, setPhone] = useState('');
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);

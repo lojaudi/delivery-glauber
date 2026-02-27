@@ -17,7 +17,7 @@ const OrderStatus = () => {
   const queryClient = useQueryClient();
   const { restaurantSlug } = useCart();
   const effectiveSlug = slug || restaurantSlug;
-  const basePath = effectiveSlug ? `/r/${effectiveSlug}` : '';
+  const basePath = effectiveSlug ? `/r/${effectiveSlug}` : '/';
   const { data: store } = useStoreConfig();
   const { order, items, isLoading, error } = useOrderWithItems(Number(id));
   const [isRefreshing, setIsRefreshing] = useState(false);
