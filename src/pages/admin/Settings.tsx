@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useDemoGuard } from '@/hooks/useDemoGuard';
 import { WhatsAppNotificationLogs } from '@/components/admin/WhatsAppNotificationLogs';
+import { WhatsAppConnection } from '@/components/admin/WhatsAppConnection';
 
 const AdminSettings = () => {
   const { checkDemoMode, canWrite } = useDemoGuard();
@@ -50,7 +51,6 @@ const AdminSettings = () => {
     msg_order_completed: '',
     is_open: true,
     address: '',
-    evolution_instance_name: ''
   });
   
   useEffect(() => {
@@ -66,7 +66,6 @@ const AdminSettings = () => {
         msg_order_completed: store.msg_order_completed || '',
         is_open: store.is_open ?? true,
         address: store.address || '',
-        evolution_instance_name: (store as any).evolution_instance_name || ''
       });
     }
   }, [store]);
@@ -95,7 +94,6 @@ const AdminSettings = () => {
         msg_order_completed: formData.msg_order_completed || null,
         is_open: formData.is_open,
         address: formData.address || null,
-        evolution_instance_name: formData.evolution_instance_name || null
       });
       toast({
         title: 'Configurações salvas!'
@@ -492,34 +490,8 @@ const AdminSettings = () => {
             </Accordion>
           </div>
 
-          {/* Evolution API / WhatsApp Auto-Notify */}
-          <div className="bg-card rounded-xl p-4 sm:p-6 shadow-card space-y-4">
-            <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm sm:text-base">
-              <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              Notificação Automática WhatsApp
-            </h3>
-            <p className="text-xs text-muted-foreground">
-              Receba uma notificação no WhatsApp cadastrado acima a cada novo pedido. 
-              Configure o nome da instância do seu servidor Evolution API.
-            </p>
-
-            <div>
-              <label className="text-xs sm:text-sm text-muted-foreground">Nome da Instância (Evolution API)</label>
-              <Input 
-                value={formData.evolution_instance_name} 
-                onChange={e => setFormData({
-                  ...formData,
-                  evolution_instance_name: e.target.value
-                })} 
-                placeholder="minha-instancia" 
-                className="mt-1" 
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Nome da instância configurada no seu servidor Evolution API. 
-                Deixe em branco para desativar as notificações automáticas.
-              </p>
-            </div>
-          </div>
+          {/* WhatsApp Connection - Evolution API */}
+          <WhatsAppConnection />
 
           {/* Submit Button */}
           <Button type="submit" size="lg" className="w-full" disabled={updateStore.isPending}>
