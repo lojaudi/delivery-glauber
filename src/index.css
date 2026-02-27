@@ -278,3 +278,8 @@
 .animate-glow {
   animation: glow 2s ease-in-out infinite;
 }
+
+
+#lovable-badge {
+  display: none !important;
+}
