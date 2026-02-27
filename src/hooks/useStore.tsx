@@ -30,6 +30,7 @@ export interface StoreConfig {
   msg_order_completed: string | null;
   restaurant_id: string | null;
   timezone: string | null;
+  evolution_instance_name: string | null;
 }
 
 export function useStoreConfig() {

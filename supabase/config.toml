@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.lookup-customer-orders]
 verify_jwt = false
+
+[functions.notify-whatsapp-order]
+verify_jwt = false
