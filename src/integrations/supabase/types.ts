@@ -735,6 +735,7 @@ export type Database = {
           delivery_fee_mode: string
           delivery_time_max: number
           delivery_time_min: number
+          evolution_instance_name: string | null
           id: string
           is_open: boolean
           kitchen_pin: string | null
@@ -767,6 +768,7 @@ export type Database = {
           delivery_fee_mode?: string
           delivery_time_max?: number
           delivery_time_min?: number
+          evolution_instance_name?: string | null
           id?: string
           is_open?: boolean
           kitchen_pin?: string | null
@@ -799,6 +801,7 @@ export type Database = {
           delivery_fee_mode?: string
           delivery_time_max?: number
           delivery_time_min?: number
+          evolution_instance_name?: string | null
           id?: string
           is_open?: boolean
           kitchen_pin?: string | null
