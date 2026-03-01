@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Loader2, Calendar, TrendingUp, Package, DollarSign, CheckCircle2, GripVertical, Wifi } from 'lucide-react';
+import { Loader2, Calendar, TrendingUp, Package, DollarSign, CheckCircle2, GripVertical, Wifi, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { useStoreConfig } from '@/hooks/useStore';
 import { useOrders, useOrderItems, useUpdateOrderStatus, Order } from '@/hooks/useOrders';
 import { useOrdersRealtime } from '@/hooks/useOrdersRealtime';
 import { OrderDetailModal } from '@/components/orders/OrderDetailModal';
+import { PrintReceiptButton } from '@/components/pdv/PrintReceiptButton';
+import { PrintOrderData } from '@/utils/thermalPrinter';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
@@ -81,6 +83,35 @@ function DroppableColumn({ id, children, color, label, count }: { id: string; ch
 function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { order: Order; store: any; onOpenDetails: (order: Order) => void; dragListeners?: any }) {
   const { data: items } = useOrderItems(order.id);
   const updateStatus = useUpdateOrderStatus();
+
+  const getPrintData = (): PrintOrderData | null => {
+    if (!items) return null;
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * Number(item.unit_price)), 0);
+    return {
+      orderNumber: order.id,
+      orderType: 'delivery',
+      customerName: order.customer_name,
+      customerPhone: order.customer_phone,
+      address: {
+        street: order.address_street,
+        number: order.address_number,
+        neighborhood: order.address_neighborhood,
+        complement: (order as any).address_complement || undefined,
+      },
+      items: items.map(item => ({
+        name: item.product_name,
+        quantity: item.quantity,
+        unitPrice: Number(item.unit_price),
+        observation: item.observation || undefined,
+      })),
+      subtotal,
+      deliveryFee: Number(order.total_amount) - subtotal,
+      total: Number(order.total_amount),
+      paymentMethod: order.payment_method,
+      changeFor: order.change_for ? Number(order.change_for) : undefined,
+      createdAt: new Date(order.created_at),
+    };
+  };
 
   const formatCurrency = (value: number) =>
     Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -305,21 +336,33 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
               )}
             </div>
             
-            {/* Status Action Button */}
-            {getNextStatus(order.status) && (
-              <Button
-                size="sm"
-                className="w-full"
-                onClick={handleStatusUpdate}
-                disabled={updateStatus.isPending}
-              >
-                {updateStatus.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  getNextStatusLabel(order.status)
-                )}
-              </Button>
-            )}
+            {/* Status Action Button + Print */}
+            <div className="flex gap-1">
+              {getNextStatus(order.status) && (
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleStatusUpdate}
+                  disabled={updateStatus.isPending}
+                >
+                  {updateStatus.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    getNextStatusLabel(order.status)
+                  )}
+                </Button>
+              )}
+              {getPrintData() && (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PrintReceiptButton
+                    orderData={getPrintData()!}
+                    variant="outline"
+                    size="icon"
+                    showOptions
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 
