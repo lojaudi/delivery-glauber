@@ -105,7 +105,7 @@ const OrderStatus = () => {
   const getStatusMessage = () => {
     switch (order.status) {
       case 'pending':
-        return 'O restaurante está analisando seu pedido';
+        return 'O estabelecimento está analisando seu pedido';
       case 'preparing':
         return 'Seu pedido está sendo preparado';
       case 'delivery':
@@ -231,7 +231,7 @@ const OrderStatus = () => {
           >
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="h-5 w-5" />
-              Falar com o Restaurante
+              Falar com o Estabelecimento
             </a>
           </Button>
         </div>

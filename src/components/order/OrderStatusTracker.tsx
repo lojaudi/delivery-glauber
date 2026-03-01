@@ -9,7 +9,7 @@ const steps = [
   { 
     id: 'pending', 
     label: 'Aguardando', 
-    description: 'Aguardando confirmação do restaurante',
+    description: 'Aguardando confirmação do estabelecimento',
     icon: Clock 
   },
   { 
