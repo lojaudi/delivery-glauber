@@ -19,7 +19,8 @@ import {
   PlusCircle,
   ExternalLink,
   Eye,
-  MapPin
+  MapPin,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,6 +56,7 @@ const getNavGroups = (basePath: string, menuPath: string) => [
       { id: 'categories', label: 'Categorias', icon: Tag, path: `${basePath}/categories` },
       { id: 'addons', label: 'Acréscimos', icon: PlusCircle, path: `${basePath}/addons` },
       { id: 'coupons', label: 'Cupons', icon: Ticket, path: `${basePath}/coupons` },
+      { id: 'reports', label: 'Relatórios', icon: BarChart3, path: `${basePath}/reports` },
     ]
   },
   {

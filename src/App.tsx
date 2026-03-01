@@ -29,6 +29,7 @@ import AdminAddons from "./pages/admin/Addons";
 import AdminPDV from "./pages/admin/PDV";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminWaiters from "./pages/admin/Waiters";
+import AdminReports from "./pages/admin/Reports";
 
 // Waiter & Kitchen Pages
 import WaiterAccess from "./pages/WaiterAccess";
@@ -89,6 +90,7 @@ const App = () => (
                 <Route path="/r/:slug/admin/addons" element={<AdminAddons />} />
                 <Route path="/r/:slug/admin/pdv" element={<AdminPDV />} />
                 <Route path="/r/:slug/admin/waiters" element={<AdminWaiters />} />
+                <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
                 
                 {/* Restaurant Waiter & Kitchen Routes (Multi-tenant) */}
                 <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
