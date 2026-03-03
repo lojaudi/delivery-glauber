@@ -38,3 +38,6 @@ verify_jwt = false
 
 [functions.notify-whatsapp-order]
 verify_jwt = false
+
+[functions.notify-whatsapp-status]
+verify_jwt = false
