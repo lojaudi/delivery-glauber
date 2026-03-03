@@ -267,7 +267,7 @@ export function useUpdateOrderStatus() {
       // First validate that the order belongs to this restaurant
       const { data: existingOrder, error: fetchError } = await supabase
         .from('orders')
-        .select('restaurant_id')
+        .select('restaurant_id, customer_name, customer_phone')
         .eq('id', orderId)
         .single();
 
@@ -285,6 +285,41 @@ export function useUpdateOrderStatus() {
         .single();
 
       if (error) throw error;
+
+      // Send WhatsApp status notification (non-blocking)
+      try {
+        const { data: storeConfig } = await supabase
+          .from('store_config')
+          .select('evolution_instance_name, name, msg_order_preparing, msg_order_delivery, msg_order_completed')
+          .eq('restaurant_id', restaurantId)
+          .single();
+
+        if (storeConfig?.evolution_instance_name && existingOrder.customer_phone) {
+          const customMessages: Record<string, string | null> = {
+            preparing: storeConfig.msg_order_preparing,
+            delivery: storeConfig.msg_order_delivery,
+            completed: storeConfig.msg_order_completed,
+          };
+
+          supabase.functions.invoke('notify-whatsapp-status', {
+            body: {
+              order_id: orderId,
+              customer_name: existingOrder.customer_name,
+              customer_phone: existingOrder.customer_phone,
+              status,
+              store_name: storeConfig.name,
+              instance: storeConfig.evolution_instance_name,
+              message: customMessages[status] || null,
+              restaurant_id: restaurantId,
+            },
+          }).catch((err) => {
+            console.warn('WhatsApp status notification failed:', err);
+          });
+        }
+      } catch (e) {
+        console.warn('Failed to send WhatsApp notification:', e);
+      }
+
       return data as Order;
     },
     onSuccess: () => {
