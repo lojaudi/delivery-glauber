@@ -440,6 +440,30 @@ const AdminSettings = () => {
                   </p>
                 </AccordionContent>
               </AccordionItem>
+              {/* Order Preparing */}
+              <AccordionItem value="preparing">
+                <AccordionTrigger className="text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">👨‍🍳</span>
+                    <span>Em Preparo</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-2">
+                  <Textarea 
+                    value={formData.msg_order_preparing} 
+                    onChange={e => setFormData({
+                      ...formData,
+                      msg_order_preparing: e.target.value
+                    })} 
+                    placeholder="Olá, {nome}! 👨‍🍳&#10;&#10;Seu pedido #{pedido} está sendo preparado!&#10;&#10;Valor: {total}&#10;&#10;Em breve sairá para entrega! 😊"
+                    className="min-h-[100px] font-mono text-xs"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Variáveis: <code className="bg-muted px-1 rounded">{'{nome}'}</code>, <code className="bg-muted px-1 rounded">{'{pedido}'}</code>, <code className="bg-muted px-1 rounded">{'{total}'}</code>, <code className="bg-muted px-1 rounded">{'{endereco}'}</code>, <code className="bg-muted px-1 rounded">{'{status}'}</code>, <code className="bg-muted px-1 rounded">{'{loja}'}</code>
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
               {/* Order Out for Delivery */}
               <AccordionItem value="delivery">
                 <AccordionTrigger className="text-sm">
@@ -459,7 +483,7 @@ const AdminSettings = () => {
                     className="min-h-[100px] font-mono text-xs"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Variáveis: <code className="bg-muted px-1 rounded">{'{nome}'}</code>, <code className="bg-muted px-1 rounded">{'{pedido}'}</code>, <code className="bg-muted px-1 rounded">{'{total}'}</code>, <code className="bg-muted px-1 rounded">{'{endereco}'}</code>
+                    Variáveis: <code className="bg-muted px-1 rounded">{'{nome}'}</code>, <code className="bg-muted px-1 rounded">{'{pedido}'}</code>, <code className="bg-muted px-1 rounded">{'{total}'}</code>, <code className="bg-muted px-1 rounded">{'{endereco}'}</code>, <code className="bg-muted px-1 rounded">{'{status}'}</code>, <code className="bg-muted px-1 rounded">{'{loja}'}</code>
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -483,7 +507,7 @@ const AdminSettings = () => {
                     className="min-h-[100px] font-mono text-xs"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Variáveis: <code className="bg-muted px-1 rounded">{'{nome}'}</code>, <code className="bg-muted px-1 rounded">{'{pedido}'}</code>, <code className="bg-muted px-1 rounded">{'{total}'}</code>
+                    Variáveis: <code className="bg-muted px-1 rounded">{'{nome}'}</code>, <code className="bg-muted px-1 rounded">{'{pedido}'}</code>, <code className="bg-muted px-1 rounded">{'{total}'}</code>, <code className="bg-muted px-1 rounded">{'{endereco}'}</code>, <code className="bg-muted px-1 rounded">{'{status}'}</code>, <code className="bg-muted px-1 rounded">{'{loja}'}</code>
                   </p>
                 </AccordionContent>
               </AccordionItem>
