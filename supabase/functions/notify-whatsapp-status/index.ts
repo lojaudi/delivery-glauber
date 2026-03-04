@@ -17,7 +17,7 @@ serve(async (req) => {
   );
 
   try {
-    const { order_id, customer_name, customer_phone, status, store_name, instance, message, restaurant_id } = await req.json();
+    const { order_id, customer_name, customer_phone, status, store_name, instance, message, restaurant_id, total_amount, address } = await req.json();
 
     const evolutionUrl = Deno.env.get('EVOLUTION_API_URL');
     const evolutionKey = Deno.env.get('EVOLUTION_API_KEY');
@@ -63,7 +63,21 @@ serve(async (req) => {
     };
 
     const statusText = statusLabels[status] || status;
-    const customMessage = message || defaultMessages[status] || `Pedido #${order_id} atualizado para: ${status}`;
+    
+    // Format total amount
+    const formattedTotal = total_amount 
+      ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(total_amount))
+      : '';
+
+    // Replace template variables in custom message
+    let customMessage = message || defaultMessages[status] || `Pedido #${order_id} atualizado para: ${status}`;
+    customMessage = customMessage
+      .replace(/\{nome\}/g, customer_name || '')
+      .replace(/\{pedido\}/g, `#${order_id}`)
+      .replace(/\{total\}/g, formattedTotal)
+      .replace(/\{endereco\}/g, address || '')
+      .replace(/\{status\}/g, statusText)
+      .replace(/\{loja\}/g, store_name || '');
 
     const text = `${statusEmoji[status] || '📋'} *Atualização do Pedido #${order_id}*\n\n` +
       `📋 *${store_name}*\n\n` +
