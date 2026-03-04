@@ -267,7 +267,7 @@ export function useUpdateOrderStatus() {
       // First validate that the order belongs to this restaurant
       const { data: existingOrder, error: fetchError } = await supabase
         .from('orders')
-        .select('restaurant_id, customer_name, customer_phone')
+        .select('restaurant_id, customer_name, customer_phone, total_amount, address_street, address_number, address_neighborhood')
         .eq('id', orderId)
         .single();
 
@@ -301,6 +301,8 @@ export function useUpdateOrderStatus() {
             completed: storeConfig.msg_order_completed,
           };
 
+          const fullAddress = [existingOrder.address_street, existingOrder.address_number, existingOrder.address_neighborhood].filter(Boolean).join(', ');
+
           supabase.functions.invoke('notify-whatsapp-status', {
             body: {
               order_id: orderId,
@@ -311,6 +313,8 @@ export function useUpdateOrderStatus() {
               instance: storeConfig.evolution_instance_name,
               message: customMessages[status] || null,
               restaurant_id: restaurantId,
+              total_amount: existingOrder.total_amount,
+              address: fullAddress,
             },
           }).catch((err) => {
             console.warn('WhatsApp status notification failed:', err);
