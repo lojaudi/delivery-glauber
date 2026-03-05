@@ -44,6 +44,9 @@ export interface SubscriptionPlan {
   // Landing page fields
   features?: string[] | null;
   is_popular?: boolean;
+  max_products?: number | null;
+  max_categories?: number | null;
+  max_orders_per_month?: number | null;
 }
 
 export interface Restaurant {

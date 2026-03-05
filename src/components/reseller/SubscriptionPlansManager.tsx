@@ -32,6 +32,9 @@ interface PlanFormData {
   is_popular: boolean;
   sort_order: number;
   features: string[];
+  max_products: string;
+  max_categories: string;
+  max_orders_per_month: string;
 }
 
 const defaultFormData: PlanFormData = {
@@ -42,6 +45,9 @@ const defaultFormData: PlanFormData = {
   is_popular: false,
   sort_order: 0,
   features: [],
+  max_products: '',
+  max_categories: '',
+  max_orders_per_month: '',
 };
 
 export function SubscriptionPlansManager() {
@@ -77,6 +83,9 @@ export function SubscriptionPlansManager() {
       is_popular: plan.is_popular || false,
       sort_order: plan.sort_order,
       features: plan.features || [],
+      max_products: plan.max_products ? String(plan.max_products) : '',
+      max_categories: plan.max_categories ? String(plan.max_categories) : '',
+      max_orders_per_month: plan.max_orders_per_month ? String(plan.max_orders_per_month) : '',
     });
     setModalOpen(true);
   };
@@ -120,6 +129,9 @@ export function SubscriptionPlansManager() {
         is_popular: formData.is_popular,
         sort_order: formData.sort_order,
         features: formData.features.length > 0 ? formData.features : null,
+        max_products: formData.max_products ? parseInt(formData.max_products) : null,
+        max_categories: formData.max_categories ? parseInt(formData.max_categories) : null,
+        max_orders_per_month: formData.max_orders_per_month ? parseInt(formData.max_orders_per_month) : null,
       };
 
       if (editingPlan) {
@@ -230,11 +242,21 @@ export function SubscriptionPlansManager() {
                       <span className="font-semibold text-primary">
                         {formatCurrency(plan.monthly_fee)}/mês
                       </span>
-                      {plan.features && plan.features.length > 0 && (
-                        <span className="text-muted-foreground">
-                          {plan.features.length} funcionalidades
-                        </span>
-                      )}
+                       {plan.features && plan.features.length > 0 && (
+                         <span className="text-muted-foreground">
+                           {plan.features.length} funcionalidades
+                         </span>
+                       )}
+                       {plan.max_products && (
+                         <span className="text-muted-foreground">
+                           {plan.max_products} produtos
+                         </span>
+                       )}
+                       {plan.max_categories && (
+                         <span className="text-muted-foreground">
+                           {plan.max_categories} categorias
+                         </span>
+                       )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -343,6 +365,49 @@ export function SubscriptionPlansManager() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Plan Limits */}
+            <div className="space-y-3 p-3 border rounded-lg">
+              <Label className="text-sm font-semibold">Limites do Plano</Label>
+              <p className="text-xs text-muted-foreground">
+                Deixe vazio para ilimitado
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="max_products" className="text-xs">Máx. Produtos</Label>
+                  <Input
+                    id="max_products"
+                    type="number"
+                    min="0"
+                    value={formData.max_products}
+                    onChange={(e) => setFormData({ ...formData, max_products: e.target.value })}
+                    placeholder="∞"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="max_categories" className="text-xs">Máx. Categorias</Label>
+                  <Input
+                    id="max_categories"
+                    type="number"
+                    min="0"
+                    value={formData.max_categories}
+                    onChange={(e) => setFormData({ ...formData, max_categories: e.target.value })}
+                    placeholder="∞"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="max_orders" className="text-xs">Pedidos/mês</Label>
+                  <Input
+                    id="max_orders"
+                    type="number"
+                    min="0"
+                    value={formData.max_orders_per_month}
+                    onChange={(e) => setFormData({ ...formData, max_orders_per_month: e.target.value })}
+                    placeholder="∞"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-between p-3 border rounded-lg">
