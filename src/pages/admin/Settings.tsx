@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { BrandSettings } from '@/components/admin/BrandSettings';
+import { StoreColorSettings } from '@/components/admin/StoreColorSettings';
 import { useStoreConfig, useUpdateStoreConfig } from '@/hooks/useStore';
 import { useBusinessHours, useUpdateBusinessHour, getDayName, BusinessHour, isStoreCurrentlyOpen } from '@/hooks/useBusinessHours';
 import { useToast } from '@/hooks/use-toast';
@@ -303,6 +304,9 @@ const AdminSettings = () => {
 
         {/* Brand Customization */}
         <BrandSettings />
+
+        {/* Store Colors */}
+        <StoreColorSettings />
 
         {/* Timezone Settings */}
         <TimezoneSettings />
