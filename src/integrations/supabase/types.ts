@@ -893,6 +893,9 @@ export type Database = {
           id: string
           is_active: boolean
           is_popular: boolean | null
+          max_categories: number | null
+          max_orders_per_month: number | null
+          max_products: number | null
           monthly_fee: number
           name: string
           reseller_id: string
@@ -908,6 +911,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_popular?: boolean | null
+          max_categories?: number | null
+          max_orders_per_month?: number | null
+          max_products?: number | null
           monthly_fee?: number
           name: string
           reseller_id: string
@@ -923,6 +929,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           is_popular?: boolean | null
+          max_categories?: number | null
+          max_orders_per_month?: number | null
+          max_products?: number | null
           monthly_fee?: number
           name?: string
           reseller_id?: string

@@ -31,6 +31,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { useDemoGuard } from '@/hooks/useDemoGuard';
+import { usePlanLimits } from '@/hooks/usePlanLimits';
 
 interface SortableCategoryItemProps {
   category: Category;
@@ -103,6 +104,7 @@ function SortableCategoryItem({ category, onEdit, onDelete }: SortableCategoryIt
 
 const AdminCategories = () => {
   const { checkDemoMode } = useDemoGuard();
+  const { limits, usage, canAddCategory } = usePlanLimits();
   const { data: categories, isLoading } = useCategories();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
@@ -130,6 +132,14 @@ const AdminCategories = () => {
   );
 
   const openCreateModal = () => {
+    if (!canAddCategory()) {
+      toast({
+        title: 'Limite de categorias atingido',
+        description: `Seu plano permite no máximo ${limits?.max_categories} categorias. Entre em contato com o administrador para fazer upgrade.`,
+        variant: 'destructive',
+      });
+      return;
+    }
     setEditingCategory(null);
     setFormData({
       name: '',
@@ -231,6 +241,11 @@ const AdminCategories = () => {
         <div>
           <p className="text-sm text-muted-foreground">
             {categories?.length || 0} categorias cadastradas
+            {limits?.max_categories && (
+              <span className="ml-1">
+                (máx: {limits.max_categories})
+              </span>
+            )}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Arraste para reordenar

@@ -27,9 +27,11 @@ import { useAddonGroups, useAddProductAddonGroup, useRemoveProductAddonGroup } f
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useDemoGuard } from '@/hooks/useDemoGuard';
+import { usePlanLimits } from '@/hooks/usePlanLimits';
 
 const AdminProducts = () => {
   const { checkDemoMode } = useDemoGuard();
+  const { limits, usage, canAddProduct } = usePlanLimits();
   const { data: products, isLoading } = useProducts();
   const { data: categories } = useCategories();
   const { data: addonGroups } = useAddonGroups();
@@ -63,6 +65,14 @@ const AdminProducts = () => {
     Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const openCreateModal = () => {
+    if (!canAddProduct()) {
+      toast({
+        title: 'Limite de produtos atingido',
+        description: `Seu plano permite no máximo ${limits?.max_products} produtos. Entre em contato com o administrador para fazer upgrade.`,
+        variant: 'destructive',
+      });
+      return;
+    }
     setEditingProduct(null);
     setFormData({
       name: '',
@@ -233,10 +243,17 @@ const AdminProducts = () => {
             className="pl-9"
           />
         </div>
-        <Button onClick={openCreateModal} className="w-full sm:w-auto">
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Produto
-        </Button>
+        <div className="flex items-center gap-3">
+          {limits?.max_products && (
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {usage?.products || 0}/{limits.max_products} produtos
+            </span>
+          )}
+          <Button onClick={openCreateModal} className="w-full sm:w-auto">
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Produto
+          </Button>
+        </div>
       </div>
 
       {/* Products Grid */}
