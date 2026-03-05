@@ -1,9 +1,20 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ResellerLayout } from '@/components/reseller/ResellerLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -14,13 +25,15 @@ import {
   Store,
   Users,
   MessageSquare,
-  History
+  History,
+  Trash2
 } from 'lucide-react';
 import { 
   useRestaurantDetails, 
   useRestaurantPayments, 
   useRestaurantAdmins,
-  useCurrentReseller
+  useCurrentReseller,
+  useDeleteRestaurant
 } from '@/hooks/useReseller';
 import { useStoreOpenStatus } from '@/hooks/useStoreOpenStatus';
 import { SubscriptionBadge } from '@/components/reseller/SubscriptionBadge';
@@ -31,6 +44,7 @@ import { RestaurantContactForm } from '@/components/reseller/RestaurantContactFo
 import { CommunicationHistory } from '@/components/reseller/CommunicationHistory';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 
 function RestaurantDetailsContent() {
@@ -42,6 +56,19 @@ function RestaurantDetailsContent() {
   const { data: admins } = useRestaurantAdmins(id);
   const { data: reseller } = useCurrentReseller();
   const { isOpen } = useStoreOpenStatus(id);
+  const deleteRestaurant = useDeleteRestaurant();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const handleDelete = async () => {
+    if (!restaurant) return;
+    try {
+      await deleteRestaurant.mutateAsync(restaurant.id);
+      toast.success(`Restaurante "${restaurant.name}" excluído com sucesso`);
+      navigate('/reseller/restaurants');
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao excluir restaurante');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -85,6 +112,10 @@ function RestaurantDetailsContent() {
         <Button onClick={() => window.open(`/r/${restaurant.slug}/admin`, '_blank')}>
           <Settings className="h-4 w-4 mr-2" />
           Acessar Painel
+        </Button>
+        <Button variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+          <Trash2 className="h-4 w-4 mr-2" />
+          Excluir
         </Button>
       </div>
 
@@ -222,6 +253,27 @@ function RestaurantDetailsContent() {
           <CommunicationHistory restaurantId={restaurant.id} />
         </TabsContent>
       </Tabs>
+      {/* Delete Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir restaurante?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é <strong>irreversível</strong>. Todos os dados do restaurante <strong>"{restaurant.name}"</strong> serão excluídos permanentemente, incluindo pedidos, produtos, categorias, mesas e configurações.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteRestaurant.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              disabled={deleteRestaurant.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteRestaurant.isPending ? 'Excluindo...' : 'Excluir permanentemente'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

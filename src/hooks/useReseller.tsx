@@ -226,12 +226,13 @@ export function useDeleteRestaurant() {
   
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('restaurants')
-        .delete()
-        .eq('id', id);
+      const { data, error } = await supabase.functions.invoke('delete-restaurant', {
+        body: { restaurant_id: id },
+      });
 
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reseller-restaurants'] });

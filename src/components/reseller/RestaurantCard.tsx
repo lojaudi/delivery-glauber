@@ -2,13 +2,14 @@ import { Restaurant } from '@/types/reseller';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Store, Calendar, CreditCard, ExternalLink, Settings, MoreVertical } from 'lucide-react';
+import { Store, Calendar, CreditCard, ExternalLink, Settings, MoreVertical, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useStoreOpenStatus } from '@/hooks/useStoreOpenStatus';
@@ -18,6 +19,7 @@ interface RestaurantCardProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onManage: (id: string) => void;
+  onDelete?: (id: string, name: string) => void;
 }
 
 const statusConfig = {
@@ -27,7 +29,7 @@ const statusConfig = {
   cancelled: { label: 'Cancelado', variant: 'outline' as const },
 };
 
-export function RestaurantCard({ restaurant, onView, onEdit, onManage }: RestaurantCardProps) {
+export function RestaurantCard({ restaurant, onView, onEdit, onManage, onDelete }: RestaurantCardProps) {
   const status = statusConfig[restaurant.subscription_status];
   const { isOpen, isLoading: isLoadingStatus } = useStoreOpenStatus(restaurant.id);
   
@@ -77,6 +79,18 @@ export function RestaurantCard({ restaurant, onView, onEdit, onManage }: Restaur
                 <Store className="h-4 w-4 mr-2" />
                 Acessar painel
               </DropdownMenuItem>
+              {onDelete && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => onDelete(restaurant.id, restaurant.name)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Excluir restaurante
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

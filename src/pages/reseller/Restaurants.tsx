@@ -12,10 +12,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Plus, Search, Store, Loader2 } from 'lucide-react';
-import { useResellerRestaurants } from '@/hooks/useReseller';
+import { useResellerRestaurants, useDeleteRestaurant } from '@/hooks/useReseller';
 import { SubscriptionStatus } from '@/types/reseller';
 import { useDemoGuard } from '@/hooks/useDemoGuard';
+import { toast } from 'sonner';
 
 function RestaurantsContent() {
   const navigate = useNavigate();
@@ -23,7 +34,20 @@ function RestaurantsContent() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<SubscriptionStatus | 'all'>('all');
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const { checkDemoMode, canWrite } = useDemoGuard();
+  const deleteRestaurant = useDeleteRestaurant();
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteRestaurant.mutateAsync(deleteTarget.id);
+      toast.success(`Restaurante "${deleteTarget.name}" excluído com sucesso`);
+      setDeleteTarget(null);
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao excluir restaurante');
+    }
+  };
 
   const filteredRestaurants = restaurants?.filter(restaurant => {
     const matchesSearch = restaurant.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -107,6 +131,7 @@ function RestaurantsContent() {
               onView={(id) => navigate(`/reseller/restaurants/${id}`)}
               onEdit={(id) => navigate(`/reseller/restaurants/${id}/edit`)}
               onManage={(id) => window.open(`/r/${restaurant.slug}/admin`, '_blank')}
+              onDelete={(id, name) => setDeleteTarget({ id, name })}
             />
           ))}
         </div>
@@ -116,6 +141,28 @@ function RestaurantsContent() {
         open={createModalOpen} 
         onOpenChange={setCreateModalOpen} 
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir restaurante?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação é <strong>irreversível</strong>. Todos os dados do restaurante <strong>"{deleteTarget?.name}"</strong> serão excluídos permanentemente, incluindo pedidos, produtos, categorias, mesas e configurações.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteRestaurant.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDelete}
+              disabled={deleteRestaurant.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteRestaurant.isPending ? 'Excluindo...' : 'Excluir permanentemente'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
