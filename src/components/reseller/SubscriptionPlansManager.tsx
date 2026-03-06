@@ -8,8 +8,9 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
-  Loader2, Plus, Pencil, Trash2, Package, Star, X
+  Loader2, Plus, Pencil, Trash2, Package, Star, X, Calendar
 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useSubscriptionPlans, useCreatePlan, useUpdatePlan, useDeletePlan } from '@/hooks/useSubscriptionPlans';
 import type { SubscriptionPlan } from '@/types/reseller';
@@ -35,6 +36,7 @@ interface PlanFormData {
   max_products: string;
   max_categories: string;
   max_orders_per_month: string;
+  duration_days: number;
 }
 
 const defaultFormData: PlanFormData = {
@@ -48,6 +50,7 @@ const defaultFormData: PlanFormData = {
   max_products: '',
   max_categories: '',
   max_orders_per_month: '',
+  duration_days: 30,
 };
 
 export function SubscriptionPlansManager() {
@@ -86,6 +89,7 @@ export function SubscriptionPlansManager() {
       max_products: plan.max_products ? String(plan.max_products) : '',
       max_categories: plan.max_categories ? String(plan.max_categories) : '',
       max_orders_per_month: plan.max_orders_per_month ? String(plan.max_orders_per_month) : '',
+      duration_days: plan.duration_days || 30,
     });
     setModalOpen(true);
   };
@@ -132,6 +136,7 @@ export function SubscriptionPlansManager() {
         max_products: formData.max_products ? parseInt(formData.max_products) : null,
         max_categories: formData.max_categories ? parseInt(formData.max_categories) : null,
         max_orders_per_month: formData.max_orders_per_month ? parseInt(formData.max_orders_per_month) : null,
+        duration_days: formData.duration_days,
       };
 
       if (editingPlan) {
@@ -240,7 +245,8 @@ export function SubscriptionPlansManager() {
                     )}
                     <div className="flex items-center gap-4 mt-2 text-sm">
                       <span className="font-semibold text-primary">
-                        {formatCurrency(plan.monthly_fee)}/mês
+                        {formatCurrency(plan.monthly_fee)}/
+                        {plan.duration_days === 30 ? 'mês' : plan.duration_days === 90 ? 'trimestre' : plan.duration_days === 180 ? 'semestre' : 'ano'}
                       </span>
                        {plan.features && plan.features.length > 0 && (
                          <span className="text-muted-foreground">
@@ -328,6 +334,44 @@ export function SubscriptionPlansManager() {
                 onChange={(e) => setFormData({ ...formData, monthly_fee: e.target.value })}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duration_days">Duração do Plano</Label>
+              <Select
+                value={String(formData.duration_days)}
+                onValueChange={(value) => setFormData({ ...formData, duration_days: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a duração" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Mensal (30 dias)
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="90">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Trimestral (90 dias)
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="180">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Semestral (180 dias)
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="360">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Anual (360 dias)
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Features */}

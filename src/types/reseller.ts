@@ -47,6 +47,7 @@ export interface SubscriptionPlan {
   max_products?: number | null;
   max_categories?: number | null;
   max_orders_per_month?: number | null;
+  duration_days: number;
 }
 
 export interface Restaurant {
