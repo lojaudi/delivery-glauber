@@ -5,6 +5,7 @@ import { HeroHeader } from '@/components/menu/HeroHeader';
 import { StoreInfo } from '@/components/menu/StoreInfo';
 import { CategoryIcons } from '@/components/menu/CategoryIcons';
 import { MenuSection } from '@/components/menu/MenuSection';
+import { FeaturedCarousel } from '@/components/menu/FeaturedCarousel';
 import { ProductModal } from '@/components/menu/ProductModal';
 import { CartButton } from '@/components/cart/CartButton';
 import { FloatingOrderButton, getLastOrderId } from '@/components/order/FloatingOrderButton';
@@ -182,6 +183,9 @@ const Index = () => {
 
   const totalItems = filteredProducts.length;
 
+  // Featured products
+  const featuredProducts = products?.filter(p => p.is_featured && p.is_available) || [];
+
   // Determine which modal to show
   const modalProduct = editingProduct?.product || selectedProduct;
   const isEditing = !!editingProduct;
@@ -217,6 +221,14 @@ const Index = () => {
             </div>
           </div>
         </div>
+
+        {/* Featured Products Carousel */}
+        {featuredProducts.length > 0 && !searchQuery && (
+          <FeaturedCarousel
+            products={featuredProducts}
+            onProductSelect={setSelectedProduct}
+          />
+        )}
 
         {/* Categories */}
         {categories && categories.length > 0 && (

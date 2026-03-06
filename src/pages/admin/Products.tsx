@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -52,6 +52,7 @@ const AdminProducts = () => {
     category_id: '',
     image_url: '',
     is_available: true,
+    is_featured: false,
   });
   const [selectedAddonGroups, setSelectedAddonGroups] = useState<string[]>([]);
   const [initialAddonGroups, setInitialAddonGroups] = useState<string[]>([]);
@@ -81,6 +82,7 @@ const AdminProducts = () => {
       category_id: '',
       image_url: '',
       is_available: true,
+      is_featured: false,
     });
     setSelectedAddonGroups([]);
     setIsModalOpen(true);
@@ -95,6 +97,7 @@ const AdminProducts = () => {
       category_id: product.category_id || '',
       image_url: product.image_url || '',
       is_available: product.is_available,
+      is_featured: product.is_featured || false,
     });
     setIsModalOpen(true);
     
@@ -135,6 +138,13 @@ const AdminProducts = () => {
     }
 
     try {
+      const featuredCount = products?.filter(p => p.is_featured && p.id !== editingProduct?.id).length || 0;
+      const wantsFeatured = formData.is_featured;
+      if (wantsFeatured && featuredCount >= 10) {
+        toast({ title: 'Limite de 10 destaques atingido', description: 'Remova um destaque antes de adicionar outro.', variant: 'destructive' });
+        return;
+      }
+
       const productData = {
         name: formData.name,
         description: formData.description || null,
@@ -142,6 +152,7 @@ const AdminProducts = () => {
         category_id: formData.category_id || null,
         image_url: formData.image_url || null,
         is_available: formData.is_available,
+        is_featured: formData.is_featured,
       };
 
       let productId: string;
@@ -277,6 +288,9 @@ const AdminProducts = () => {
                   <Badge variant={product.is_available ? 'open' : 'closed'} className="text-[10px] sm:text-xs flex-shrink-0">
                     {product.is_available ? 'Ativo' : 'Inativo'}
                   </Badge>
+                  {product.is_featured && (
+                    <Star className="h-3.5 w-3.5 text-primary fill-primary flex-shrink-0" />
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mb-1 truncate">
                   {getCategoryName(product.category_id)}
@@ -418,6 +432,22 @@ const AdminProducts = () => {
                 </p>
               </div>
             )}
+
+            {/* Featured Toggle */}
+            <div className="flex items-center space-x-3 bg-muted/50 rounded-lg p-3">
+              <Checkbox
+                id="is_featured"
+                checked={formData.is_featured}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_featured: !!checked })}
+              />
+              <Label htmlFor="is_featured" className="text-sm font-normal cursor-pointer flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Star className="h-4 w-4 text-primary fill-primary" />
+                  <span>Produto destaque</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Exibido no carrossel de destaques (máx. 10)</p>
+              </Label>
+            </div>
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>

@@ -11,6 +11,7 @@ export interface Product {
   price: number;
   image_url: string | null;
   is_available: boolean;
+  is_featured: boolean;
   restaurant_id?: string | null;
 }
 
