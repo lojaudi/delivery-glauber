@@ -34,7 +34,7 @@ interface PlanFormData {
   sort_order: number;
   features: string[];
   max_products: string;
-  max_categories: string;
+  
   max_orders_per_month: string;
   duration_days: number;
 }
@@ -48,7 +48,7 @@ const defaultFormData: PlanFormData = {
   sort_order: 0,
   features: [],
   max_products: '',
-  max_categories: '',
+  
   max_orders_per_month: '',
   duration_days: 30,
 };
@@ -87,7 +87,7 @@ export function SubscriptionPlansManager() {
       sort_order: plan.sort_order,
       features: plan.features || [],
       max_products: plan.max_products ? String(plan.max_products) : '',
-      max_categories: plan.max_categories ? String(plan.max_categories) : '',
+      
       max_orders_per_month: plan.max_orders_per_month ? String(plan.max_orders_per_month) : '',
       duration_days: plan.duration_days || 30,
     });
@@ -134,7 +134,7 @@ export function SubscriptionPlansManager() {
         sort_order: formData.sort_order,
         features: formData.features.length > 0 ? formData.features : null,
         max_products: formData.max_products ? parseInt(formData.max_products) : null,
-        max_categories: formData.max_categories ? parseInt(formData.max_categories) : null,
+        max_categories: null,
         max_orders_per_month: formData.max_orders_per_month ? parseInt(formData.max_orders_per_month) : null,
         duration_days: formData.duration_days,
       };
@@ -256,11 +256,6 @@ export function SubscriptionPlansManager() {
                        {plan.max_products && (
                          <span className="text-muted-foreground">
                            {plan.max_products} produtos
-                         </span>
-                       )}
-                       {plan.max_categories && (
-                         <span className="text-muted-foreground">
-                           {plan.max_categories} categorias
                          </span>
                        )}
                     </div>
@@ -417,7 +412,7 @@ export function SubscriptionPlansManager() {
               <p className="text-xs text-muted-foreground">
                 Deixe vazio para ilimitado
               </p>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label htmlFor="max_products" className="text-xs">Máx. Produtos</Label>
                   <Input
@@ -426,17 +421,6 @@ export function SubscriptionPlansManager() {
                     min="0"
                     value={formData.max_products}
                     onChange={(e) => setFormData({ ...formData, max_products: e.target.value })}
-                    placeholder="∞"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="max_categories" className="text-xs">Máx. Categorias</Label>
-                  <Input
-                    id="max_categories"
-                    type="number"
-                    min="0"
-                    value={formData.max_categories}
-                    onChange={(e) => setFormData({ ...formData, max_categories: e.target.value })}
                     placeholder="∞"
                   />
                 </div>
