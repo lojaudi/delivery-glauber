@@ -37,6 +37,7 @@ interface PlanFormData {
   
   max_orders_per_month: string;
   duration_days: number;
+  trial_days: string;
 }
 
 const defaultFormData: PlanFormData = {
@@ -51,6 +52,7 @@ const defaultFormData: PlanFormData = {
   
   max_orders_per_month: '',
   duration_days: 30,
+  trial_days: '7',
 };
 
 export function SubscriptionPlansManager() {
@@ -90,6 +92,7 @@ export function SubscriptionPlansManager() {
       
       max_orders_per_month: plan.max_orders_per_month ? String(plan.max_orders_per_month) : '',
       duration_days: plan.duration_days || 30,
+      trial_days: String(plan.trial_days || 0),
     });
     setModalOpen(true);
   };
@@ -128,7 +131,7 @@ export function SubscriptionPlansManager() {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
         monthly_fee: parseFloat(formData.monthly_fee) || 0,
-        trial_days: 0,
+        trial_days: parseInt(formData.trial_days) || 0,
         is_active: formData.is_active,
         is_popular: formData.is_popular,
         sort_order: formData.sort_order,
@@ -369,7 +372,22 @@ export function SubscriptionPlansManager() {
               </Select>
             </div>
 
-            {/* Features */}
+            <div className="space-y-2">
+              <Label htmlFor="trial_days">Dias de teste gratuito</Label>
+              <Input
+                id="trial_days"
+                type="number"
+                min="0"
+                max="90"
+                value={formData.trial_days}
+                onChange={(e) => setFormData({ ...formData, trial_days: e.target.value })}
+                placeholder="0 = sem teste"
+              />
+              <p className="text-xs text-muted-foreground">
+                Período de trial antes da cobrança. 0 para desativar.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <Label>Funcionalidades (para landing page)</Label>
               <div className="flex gap-2">
