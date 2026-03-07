@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useRestaurant } from './useRestaurant';
+import { useAdminRestaurant } from './useAdminRestaurant';
 
 export interface Customer {
   id: string;
@@ -14,7 +14,7 @@ export interface Customer {
 }
 
 export function useCustomers() {
-  const { restaurantId } = useRestaurant();
+  const { restaurantId } = useAdminRestaurant();
   const queryClient = useQueryClient();
 
   const customersQuery = useQuery({
