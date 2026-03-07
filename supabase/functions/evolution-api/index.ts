@@ -43,7 +43,8 @@ serve(async (req) => {
   }
 
   try {
-    const { action, instance_name, restaurant_id } = await req.json();
+    const reqBody = await req.json();
+    const { action, instance_name, restaurant_id, phone, message: msgText, mediaUrl, mediaType } = reqBody;
 
     // Verify user can manage this restaurant
     const { data: canManage } = await supabaseAdmin.rpc('can_manage_restaurant', {
