@@ -30,6 +30,7 @@ import AdminPDV from "./pages/admin/PDV";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminWaiters from "./pages/admin/Waiters";
 import AdminReports from "./pages/admin/Reports";
+import AdminCustomers from "./pages/admin/Customers";
 
 // Waiter & Kitchen Pages
 import WaiterAccess from "./pages/WaiterAccess";
