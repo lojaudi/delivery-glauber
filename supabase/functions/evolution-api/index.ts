@@ -43,7 +43,8 @@ serve(async (req) => {
   }
 
   try {
-    const { action, instance_name, restaurant_id } = await req.json();
+    const reqBody = await req.json();
+    const { action, instance_name, restaurant_id, phone, message: msgText, mediaUrl, mediaType } = reqBody;
 
     // Verify user can manage this restaurant
     const { data: canManage } = await supabaseAdmin.rpc('can_manage_restaurant', {
@@ -194,6 +195,65 @@ serve(async (req) => {
           .update({ evolution_instance_name: null })
           .eq('restaurant_id', restaurant_id);
 
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      case 'sendText': {
+        const targetInstance = instance_name;
+        if (!targetInstance || !phone || !msgText) {
+          return new Response(JSON.stringify({ error: 'instance_name, phone and message required' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        let formattedPhone = phone.replace(/\D/g, '');
+        if (!formattedPhone.startsWith('55')) formattedPhone = '55' + formattedPhone;
+
+        const sendRes = await fetch(`${evolutionUrl}/message/sendText/${targetInstance}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ number: formattedPhone, text: msgText }),
+        });
+        const sendData = await sendRes.text();
+        console.log('sendText response:', sendRes.status, sendData);
+        if (!sendRes.ok) {
+          return new Response(JSON.stringify({ error: `Erro ao enviar: ${sendData}` }), {
+            status: sendRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      case 'sendMedia': {
+        const targetInst = instance_name;
+        if (!targetInst || !phone || !mediaUrl) {
+          return new Response(JSON.stringify({ error: 'instance_name, phone and mediaUrl required' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        let fPhone = phone.replace(/\D/g, '');
+        if (!fPhone.startsWith('55')) fPhone = '55' + fPhone;
+
+        const mediaRes = await fetch(`${evolutionUrl}/message/sendMedia/${targetInst}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            number: fPhone,
+            mediatype: mediaType || 'image',
+            media: mediaUrl,
+            caption: msgText || '',
+          }),
+        });
+        const mediaData = await mediaRes.text();
+        console.log('sendMedia response:', mediaRes.status, mediaData);
+        if (!mediaRes.ok) {
+          return new Response(JSON.stringify({ error: `Erro ao enviar mídia: ${mediaData}` }), {
+            status: mediaRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });

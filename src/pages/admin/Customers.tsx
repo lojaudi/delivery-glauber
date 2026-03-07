@@ -174,7 +174,7 @@ export default function Customers() {
           phone: r.customer_phone,
           name: r.customer_name,
         }));
-        startSending(campaign.id, recipientData, campaignMessage, imageUrl, store?.evolution_instance_name || '');
+        startSending(campaign.id, recipientData, campaignMessage, imageUrl, store?.evolution_instance_name || '', restaurantId);
         toast({ title: 'Envio iniciado!', description: 'Você pode navegar por outras páginas sem perder o progresso.' });
       }
 
