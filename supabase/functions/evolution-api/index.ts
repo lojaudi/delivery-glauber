@@ -228,15 +228,13 @@ serve(async (req) => {
       }
 
       case 'sendMedia': {
-        const body2 = await req.clone().json();
-        const { phone: ph, message: cap, instance: inst2, mediaUrl, mediaType } = body2;
-        const targetInst = inst2 || instance_name;
-        if (!targetInst || !ph || !mediaUrl) {
-          return new Response(JSON.stringify({ error: 'instance, phone and mediaUrl required' }), {
+        const targetInst = instance_name;
+        if (!targetInst || !phone || !mediaUrl) {
+          return new Response(JSON.stringify({ error: 'instance_name, phone and mediaUrl required' }), {
             status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
-        let fPhone = ph.replace(/\D/g, '');
+        let fPhone = phone.replace(/\D/g, '');
         if (!fPhone.startsWith('55')) fPhone = '55' + fPhone;
 
         const mediaRes = await fetch(`${evolutionUrl}/message/sendMedia/${targetInst}`, {
@@ -246,10 +244,11 @@ serve(async (req) => {
             number: fPhone,
             mediatype: mediaType || 'image',
             media: mediaUrl,
-            caption: cap || '',
+            caption: msgText || '',
           }),
         });
         const mediaData = await mediaRes.text();
+        console.log('sendMedia response:', mediaRes.status, mediaData);
         if (!mediaRes.ok) {
           return new Response(JSON.stringify({ error: `Erro ao enviar mídia: ${mediaData}` }), {
             status: mediaRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
