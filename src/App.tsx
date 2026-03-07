@@ -93,6 +93,7 @@ const App = () => (
                 <Route path="/r/:slug/admin/pdv" element={<AdminPDV />} />
                 <Route path="/r/:slug/admin/waiters" element={<AdminWaiters />} />
                 <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
+                <Route path="/r/:slug/admin/customers" element={<AdminCustomers />} />
                 
                 {/* Restaurant Waiter & Kitchen Routes (Multi-tenant) */}
                 <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
