@@ -12,7 +12,7 @@ interface CampaignSendState {
 
 interface CampaignSenderContextType {
   state: CampaignSendState;
-  startSending: (campaignId: string, recipients: { id: string; phone: string; name: string }[], message: string, imageUrl?: string | null, instanceName?: string) => void;
+  startSending: (campaignId: string, recipients: { id: string; phone: string; name: string }[], message: string, imageUrl?: string | null, instanceName?: string, restaurantId?: string) => void;
   cancelSending: () => void;
 }
 
