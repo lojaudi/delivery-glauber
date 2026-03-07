@@ -33,7 +33,7 @@ const ITEMS_PER_PAGE = 10;
 
 export default function Customers() {
   const { customers, isLoading, deleteCustomers } = useCustomers();
-  const { restaurantId } = useRestaurant();
+  const { restaurantId } = useAdminRestaurant();
   const { data: store } = useStoreConfig();
   const { user } = useAuth();
   const { toast } = useToast();
