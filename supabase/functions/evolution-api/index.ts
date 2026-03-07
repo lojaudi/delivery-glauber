@@ -199,6 +199,67 @@ serve(async (req) => {
         });
       }
 
+      case 'sendText': {
+        const body = await req.clone().json();
+        const { phone, message: msgText, instance: inst } = body;
+        const targetInstance = inst || instance_name;
+        if (!targetInstance || !phone || !msgText) {
+          return new Response(JSON.stringify({ error: 'instance, phone and message required' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        let formattedPhone = phone.replace(/\D/g, '');
+        if (!formattedPhone.startsWith('55')) formattedPhone = '55' + formattedPhone;
+
+        const sendRes = await fetch(`${evolutionUrl}/message/sendText/${targetInstance}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ number: formattedPhone, text: msgText }),
+        });
+        const sendData = await sendRes.text();
+        if (!sendRes.ok) {
+          return new Response(JSON.stringify({ error: `Erro ao enviar: ${sendData}` }), {
+            status: sendRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      case 'sendMedia': {
+        const body2 = await req.clone().json();
+        const { phone: ph, message: cap, instance: inst2, mediaUrl, mediaType } = body2;
+        const targetInst = inst2 || instance_name;
+        if (!targetInst || !ph || !mediaUrl) {
+          return new Response(JSON.stringify({ error: 'instance, phone and mediaUrl required' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        let fPhone = ph.replace(/\D/g, '');
+        if (!fPhone.startsWith('55')) fPhone = '55' + fPhone;
+
+        const mediaRes = await fetch(`${evolutionUrl}/message/sendMedia/${targetInst}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            number: fPhone,
+            mediatype: mediaType || 'image',
+            media: mediaUrl,
+            caption: cap || '',
+          }),
+        });
+        const mediaData = await mediaRes.text();
+        if (!mediaRes.ok) {
+          return new Response(JSON.stringify({ error: `Erro ao enviar mídia: ${mediaData}` }), {
+            status: mediaRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       default:
         return new Response(JSON.stringify({ error: 'Ação inválida' }), {
           status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
