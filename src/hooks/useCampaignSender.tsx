@@ -37,6 +37,7 @@ export function CampaignSenderProvider({ children }: { children: ReactNode }) {
     message: string,
     imageUrl?: string | null,
     instanceName?: string,
+    restaurantId?: string,
   ) => {
     cancelledRef.current = false;
     setState({
