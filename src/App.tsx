@@ -60,6 +60,7 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <CampaignSenderProvider>
         <CartProvider>
           <TooltipProvider>
             <Toaster />
