@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useCustomers } from '@/hooks/useCustomers';
-import { useRestaurant } from '@/hooks/useRestaurant';
+import { useAdminRestaurant } from '@/hooks/useAdminRestaurant';
 import { useCampaignSender } from '@/hooks/useCampaignSender';
 import { useStoreConfig } from '@/hooks/useStore';
 import { supabase } from '@/integrations/supabase/client';
