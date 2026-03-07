@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/hooks/useCart";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CampaignSenderProvider } from "@/hooks/useCampaignSender";
 
 // Client Pages
 import Index from "./pages/Index";
@@ -30,6 +31,7 @@ import AdminPDV from "./pages/admin/PDV";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminWaiters from "./pages/admin/Waiters";
 import AdminReports from "./pages/admin/Reports";
+import AdminCustomers from "./pages/admin/Customers";
 
 // Waiter & Kitchen Pages
 import WaiterAccess from "./pages/WaiterAccess";
@@ -58,6 +60,7 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <CampaignSenderProvider>
         <CartProvider>
           <TooltipProvider>
             <Toaster />
@@ -91,6 +94,7 @@ const App = () => (
                 <Route path="/r/:slug/admin/pdv" element={<AdminPDV />} />
                 <Route path="/r/:slug/admin/waiters" element={<AdminWaiters />} />
                 <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
+                <Route path="/r/:slug/admin/customers" element={<AdminCustomers />} />
                 
                 {/* Restaurant Waiter & Kitchen Routes (Multi-tenant) */}
                 <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
@@ -120,6 +124,7 @@ const App = () => (
             </BrowserRouter>
           </TooltipProvider>
         </CartProvider>
+        </CampaignSenderProvider>
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
