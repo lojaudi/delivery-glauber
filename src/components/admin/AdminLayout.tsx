@@ -20,7 +20,8 @@ import {
   ExternalLink,
   Eye,
   MapPin,
-  BarChart3
+  BarChart3,
+  UserRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
