@@ -58,6 +58,7 @@ const getNavGroups = (basePath: string, menuPath: string) => [
       { id: 'addons', label: 'Acréscimos', icon: PlusCircle, path: `${basePath}/addons` },
       { id: 'coupons', label: 'Cupons', icon: Ticket, path: `${basePath}/coupons` },
       { id: 'reports', label: 'Relatórios', icon: BarChart3, path: `${basePath}/reports` },
+      { id: 'customers', label: 'Clientes', icon: UserRound, path: `${basePath}/customers` },
     ]
   },
   {
