@@ -124,6 +124,7 @@ const App = () => (
             </BrowserRouter>
           </TooltipProvider>
         </CartProvider>
+        </CampaignSenderProvider>
       </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
