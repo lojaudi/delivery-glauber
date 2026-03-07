@@ -61,13 +61,17 @@ export function CampaignSenderProvider({ children }: { children: ReactNode }) {
       const recipient = recipients[i];
       
       try {
-        // Send via Evolution API edge function
+        const personalizedMsg = message.replace('{nome}', recipient.name);
+        
+        // Choose action based on whether image is present
+        const action = imageUrl ? 'sendMedia' : 'sendText';
         const { error } = await supabase.functions.invoke('evolution-api', {
           body: {
-            action: 'sendText',
-            instance: instanceName,
+            action,
+            instance_name: instanceName,
+            restaurant_id: restaurantId,
             phone: recipient.phone,
-            message: message.replace('{nome}', recipient.name),
+            message: personalizedMsg,
             ...(imageUrl ? { mediaUrl: imageUrl, mediaType: 'image' } : {}),
           },
         });
