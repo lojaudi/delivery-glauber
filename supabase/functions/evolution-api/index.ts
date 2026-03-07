@@ -201,11 +201,9 @@ serve(async (req) => {
       }
 
       case 'sendText': {
-        const body = await req.clone().json();
-        const { phone, message: msgText, instance: inst } = body;
-        const targetInstance = inst || instance_name;
+        const targetInstance = instance_name;
         if (!targetInstance || !phone || !msgText) {
-          return new Response(JSON.stringify({ error: 'instance, phone and message required' }), {
+          return new Response(JSON.stringify({ error: 'instance_name, phone and message required' }), {
             status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
@@ -218,6 +216,7 @@ serve(async (req) => {
           body: JSON.stringify({ number: formattedPhone, text: msgText }),
         });
         const sendData = await sendRes.text();
+        console.log('sendText response:', sendRes.status, sendData);
         if (!sendRes.ok) {
           return new Response(JSON.stringify({ error: `Erro ao enviar: ${sendData}` }), {
             status: sendRes.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
