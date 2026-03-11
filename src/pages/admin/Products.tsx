@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -211,6 +211,33 @@ const AdminProducts = () => {
     }
   };
 
+  const handleDuplicate = async (product: Product) => {
+    if (checkDemoMode()) return;
+    if (!canAddProduct()) {
+      toast({
+        title: 'Limite de produtos atingido',
+        description: `Seu plano permite no máximo ${limits?.max_products} produtos.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await createProduct.mutateAsync({
+        name: `${product.name} (cópia)`,
+        description: product.description,
+        price: product.price,
+        category_id: product.category_id,
+        image_url: product.image_url,
+        is_available: product.is_available,
+        is_featured: false,
+      });
+      toast({ title: 'Produto duplicado!' });
+    } catch (error: any) {
+      toast({ title: 'Erro ao duplicar', description: error.message, variant: 'destructive' });
+    }
+  };
+
   const toggleAvailability = async (product: Product) => {
     if (checkDemoMode()) return;
     try {
@@ -314,6 +341,9 @@ const AdminProducts = () => {
               </Button>
               <Button variant="action-icon" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => openEditModal(product)}>
                 <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Button>
+              <Button variant="action-icon" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => handleDuplicate(product)} title="Duplicar produto">
+                <Copy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
               <Button variant="action-icon-destructive" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => handleDelete(product)}>
                 <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
