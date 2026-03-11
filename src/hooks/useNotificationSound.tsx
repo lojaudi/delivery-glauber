@@ -5,7 +5,7 @@ const LOOP_INTERVAL = 3000; // Repeat sound every 3 seconds
 export function useNotificationSound() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const isEnabledRef = useRef(true);
-  const loopIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const loopIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isLoopingRef = useRef(false);
 
   useEffect(() => {
