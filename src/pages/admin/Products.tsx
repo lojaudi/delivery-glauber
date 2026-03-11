@@ -342,6 +342,9 @@ const AdminProducts = () => {
               <Button variant="action-icon" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => openEditModal(product)}>
                 <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
+              <Button variant="action-icon" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => handleDuplicate(product)} title="Duplicar produto">
+                <Copy className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Button>
               <Button variant="action-icon-destructive" size="icon" className="h-8 w-8 sm:h-9 sm:w-9" onClick={() => handleDelete(product)}>
                 <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
