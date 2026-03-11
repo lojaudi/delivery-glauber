@@ -211,6 +211,33 @@ const AdminProducts = () => {
     }
   };
 
+  const handleDuplicate = async (product: Product) => {
+    if (checkDemoMode()) return;
+    if (!canAddProduct()) {
+      toast({
+        title: 'Limite de produtos atingido',
+        description: `Seu plano permite no máximo ${limits?.max_products} produtos.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await createProduct.mutateAsync({
+        name: `${product.name} (cópia)`,
+        description: product.description,
+        price: product.price,
+        category_id: product.category_id,
+        image_url: product.image_url,
+        is_available: product.is_available,
+        is_featured: false,
+      });
+      toast({ title: 'Produto duplicado!' });
+    } catch (error: any) {
+      toast({ title: 'Erro ao duplicar', description: error.message, variant: 'destructive' });
+    }
+  };
+
   const toggleAvailability = async (product: Product) => {
     if (checkDemoMode()) return;
     try {
