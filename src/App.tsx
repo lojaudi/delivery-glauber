@@ -33,11 +33,13 @@ import AdminWaiters from "./pages/admin/Waiters";
 import AdminReports from "./pages/admin/Reports";
 import AdminCustomers from "./pages/admin/Customers";
 
-// Waiter & Kitchen Pages
+// Waiter, Kitchen & Driver Pages
 import WaiterAccess from "./pages/WaiterAccess";
 import WaiterDashboard from "./pages/WaiterDashboard";
 import Kitchen from "./pages/Kitchen";
 import KitchenLogin from "./pages/KitchenLogin";
+import DriverAccess from "./pages/DriverAccess";
+import DriverDashboard from "./pages/DriverDashboard";
 
 // Reseller Pages
 import ResellerDashboard from "./pages/reseller/Dashboard";
