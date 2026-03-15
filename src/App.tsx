@@ -98,11 +98,13 @@ const App = () => (
                 <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
                 <Route path="/r/:slug/admin/customers" element={<AdminCustomers />} />
                 
-                {/* Restaurant Waiter & Kitchen Routes (Multi-tenant) */}
+                {/* Restaurant Waiter, Kitchen & Driver Routes (Multi-tenant) */}
                 <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
                 <Route path="/r/:slug/waiter/dashboard" element={<WaiterDashboard />} />
                 <Route path="/r/:slug/kitchen" element={<Kitchen />} />
                 <Route path="/r/:slug/kitchen/login" element={<KitchenLogin />} />
+                <Route path="/r/:slug/driver" element={<DriverAccess />} />
+                <Route path="/r/:slug/driver/dashboard" element={<DriverDashboard />} />
                 
                 {/* Legacy Admin Routes - Redirect to auth for restaurant admins */}
                 <Route path="/admin/*" element={<Auth />} />
