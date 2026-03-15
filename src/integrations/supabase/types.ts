@@ -447,6 +447,73 @@ export type Database = {
           },
         ]
       }
+      delivery_assignments: {
+        Row: {
+          accepted_at: string | null
+          assigned_at: string
+          created_at: string
+          delivered_at: string | null
+          driver_id: string | null
+          id: string
+          order_id: number
+          picked_up_at: string | null
+          rejected_at: string | null
+          restaurant_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          assigned_at?: string
+          created_at?: string
+          delivered_at?: string | null
+          driver_id?: string | null
+          id?: string
+          order_id: number
+          picked_up_at?: string | null
+          rejected_at?: string | null
+          restaurant_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          assigned_at?: string
+          created_at?: string
+          delivered_at?: string | null
+          driver_id?: string | null
+          id?: string
+          order_id?: number
+          picked_up_at?: string | null
+          rejected_at?: string | null
+          restaurant_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_assignments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_assignments_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_zones: {
         Row: {
           created_at: string
@@ -484,6 +551,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "delivery_zones_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drivers: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_online: boolean
+          name: string
+          phone: string | null
+          pin: string | null
+          restaurant_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_online?: boolean
+          name: string
+          phone?: string | null
+          pin?: string | null
+          restaurant_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_online?: boolean
+          name?: string
+          phone?: string | null
+          pin?: string | null
+          restaurant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_restaurant_id_fkey"
             columns: ["restaurant_id"]
             isOneToOne: false
             referencedRelation: "restaurants"

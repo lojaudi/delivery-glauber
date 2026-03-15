@@ -32,12 +32,15 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminWaiters from "./pages/admin/Waiters";
 import AdminReports from "./pages/admin/Reports";
 import AdminCustomers from "./pages/admin/Customers";
+import AdminDrivers from "./pages/admin/Drivers";
 
-// Waiter & Kitchen Pages
+// Waiter, Kitchen & Driver Pages
 import WaiterAccess from "./pages/WaiterAccess";
 import WaiterDashboard from "./pages/WaiterDashboard";
 import Kitchen from "./pages/Kitchen";
 import KitchenLogin from "./pages/KitchenLogin";
+import DriverAccess from "./pages/DriverAccess";
+import DriverDashboard from "./pages/DriverDashboard";
 
 // Reseller Pages
 import ResellerDashboard from "./pages/reseller/Dashboard";
@@ -95,12 +98,15 @@ const App = () => (
                 <Route path="/r/:slug/admin/waiters" element={<AdminWaiters />} />
                 <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
                 <Route path="/r/:slug/admin/customers" element={<AdminCustomers />} />
+                <Route path="/r/:slug/admin/drivers" element={<AdminDrivers />} />
                 
-                {/* Restaurant Waiter & Kitchen Routes (Multi-tenant) */}
+                {/* Restaurant Waiter, Kitchen & Driver Routes (Multi-tenant) */}
                 <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
                 <Route path="/r/:slug/waiter/dashboard" element={<WaiterDashboard />} />
                 <Route path="/r/:slug/kitchen" element={<Kitchen />} />
                 <Route path="/r/:slug/kitchen/login" element={<KitchenLogin />} />
+                <Route path="/r/:slug/driver" element={<DriverAccess />} />
+                <Route path="/r/:slug/driver/dashboard" element={<DriverDashboard />} />
                 
                 {/* Legacy Admin Routes - Redirect to auth for restaurant admins */}
                 <Route path="/admin/*" element={<Auth />} />

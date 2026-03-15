@@ -22,6 +22,7 @@ import {
   MapPin,
   BarChart3,
   UserRound,
+  Truck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +47,8 @@ const getNavGroups = (basePath: string, menuPath: string) => [
       { id: 'pdv', label: 'PDV', icon: Store, path: `${basePath}/pdv` },
       { id: 'kitchen', label: 'Cozinha', icon: ChefHat, path: `${menuPath}/kitchen`, external: true },
       { id: 'waiters', label: 'Garçons', icon: Users, path: `${basePath}/waiters` },
+      { id: 'drivers', label: 'Entregadores', icon: Truck, path: `${basePath}/drivers` },
+      { id: 'driver-access', label: 'Acesso Entregadores', icon: Truck, path: `${menuPath}/driver`, external: true },
       { id: 'waiter-access', label: 'Acesso Garçons', icon: Users, path: `${menuPath}/waiter`, external: true },
     ]
   },

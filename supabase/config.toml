@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.delete-restaurant]
 verify_jwt = false
+
+[functions.verify-driver-pin]
+verify_jwt = false
