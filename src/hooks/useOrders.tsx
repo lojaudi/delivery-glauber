@@ -324,6 +324,19 @@ export function useUpdateOrderStatus() {
         console.warn('Failed to send WhatsApp notification:', e);
       }
 
+      // Create delivery assignment when status changes to "delivery"
+      if (status === 'delivery') {
+        try {
+          await supabase.from('delivery_assignments').insert({
+            order_id: orderId,
+            restaurant_id: restaurantId,
+            status: 'pending',
+          });
+        } catch (e) {
+          console.warn('Failed to create delivery assignment:', e);
+        }
+      }
+
       return data as Order;
     },
     onSuccess: () => {
