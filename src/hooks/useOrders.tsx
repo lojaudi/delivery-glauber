@@ -324,7 +324,7 @@ export function useUpdateOrderStatus() {
         console.warn('Failed to send WhatsApp notification:', e);
       }
 
-      // Create delivery assignment when status changes to "delivery"
+      // Create delivery assignment and notify drivers when status changes to "delivery"
       if (status === 'delivery') {
         try {
           await supabase.from('delivery_assignments').insert({
@@ -334,6 +334,34 @@ export function useUpdateOrderStatus() {
           });
         } catch (e) {
           console.warn('Failed to create delivery assignment:', e);
+        }
+
+        // Notify drivers via WhatsApp (non-blocking)
+        try {
+          const fullAddress = [existingOrder.address_street, existingOrder.address_number, existingOrder.address_neighborhood].filter(Boolean).join(', ');
+          
+          // Get slug from restaurant
+          const { data: restaurant } = await supabase
+            .from('restaurants')
+            .select('slug')
+            .eq('id', restaurantId)
+            .single();
+
+          supabase.functions.invoke('notify-driver-whatsapp', {
+            body: {
+              order_id: orderId,
+              customer_name: existingOrder.customer_name,
+              total_amount: existingOrder.total_amount,
+              payment_method: data.payment_method,
+              address: fullAddress,
+              restaurant_id: restaurantId,
+              slug: restaurant?.slug || '',
+            },
+          }).catch((err) => {
+            console.warn('Driver WhatsApp notification failed:', err);
+          });
+        } catch (e) {
+          console.warn('Failed to notify drivers via WhatsApp:', e);
         }
       }
 

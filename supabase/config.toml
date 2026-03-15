@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.verify-driver-pin]
 verify_jwt = false
+
+[functions.notify-driver-whatsapp]
+verify_jwt = false
