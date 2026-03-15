@@ -32,6 +32,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminWaiters from "./pages/admin/Waiters";
 import AdminReports from "./pages/admin/Reports";
 import AdminCustomers from "./pages/admin/Customers";
+import AdminDrivers from "./pages/admin/Drivers";
 
 // Waiter, Kitchen & Driver Pages
 import WaiterAccess from "./pages/WaiterAccess";
