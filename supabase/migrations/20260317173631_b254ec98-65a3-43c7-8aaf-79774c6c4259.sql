@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN allows_half boolean NOT NULL DEFAULT false;
