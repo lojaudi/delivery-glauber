@@ -59,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cartData);
   }, [cartData]);
 
-  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => {
+  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfProduct?: CartItem['halfProduct']) => {
     setCartData(prev => {
       const existingIndex = prev.items.findIndex(item => item.product.id === product.id);
       
@@ -70,11 +70,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingIndex].quantity + quantity,
           observation: observation || updatedItems[existingIndex].observation,
           selectedAddons: selectedAddons || updatedItems[existingIndex].selectedAddons,
+          halfProduct: halfProduct || updatedItems[existingIndex].halfProduct,
         };
         return { ...prev, items: updatedItems };
       }
       
-      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons }] };
+      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, halfProduct }] };
     });
   };
 
