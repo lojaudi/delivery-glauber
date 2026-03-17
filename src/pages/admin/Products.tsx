@@ -84,6 +84,7 @@ const AdminProducts = () => {
       image_url: '',
       is_available: true,
       is_featured: false,
+      allows_half: false,
     });
     setSelectedAddonGroups([]);
     setIsModalOpen(true);
