@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { CartProvider } from "@/hooks/useCart";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CampaignSenderProvider } from "@/hooks/useCampaignSender";
+import { DynamicPageTitle } from "@/components/DynamicPageTitle";
 
 // Client Pages
 import Index from "./pages/Index";
@@ -64,6 +65,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CampaignSenderProvider>
+        <DynamicPageTitle />
         <CartProvider>
           <TooltipProvider>
             <Toaster />

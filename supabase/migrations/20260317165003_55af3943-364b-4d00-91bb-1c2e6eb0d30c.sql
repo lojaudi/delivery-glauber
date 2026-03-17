@@ -1,0 +1,1 @@
+ALTER TABLE public.resellers ADD COLUMN platform_name text DEFAULT NULL;

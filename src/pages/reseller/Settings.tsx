@@ -25,6 +25,7 @@ function SettingsContent() {
     email: '',
     phone: '',
     company_name: '',
+    platform_name: '',
   });
 
   useEffect(() => {
@@ -34,6 +35,7 @@ function SettingsContent() {
         email: reseller.email || '',
         phone: reseller.phone || '',
         company_name: reseller.company_name || '',
+        platform_name: (reseller as any).platform_name || '',
       });
     }
   }, [reseller]);
@@ -105,6 +107,19 @@ function SettingsContent() {
                   placeholder="Seu nome"
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="platform_name">Nome da Plataforma (título do sistema)</Label>
+                <Input
+                  id="platform_name"
+                  value={formData.platform_name}
+                  onChange={(e) => setFormData({ ...formData, platform_name: e.target.value })}
+                  placeholder="Ex: Minha Plataforma Delivery"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Este nome aparece como título da aba do navegador e no SEO do sistema.
+                </p>
               </div>
 
               <div className="space-y-2">
