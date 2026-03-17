@@ -34,6 +34,8 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [halfHalfProduct, setHalfHalfProduct] = useState<Product | null>(null);
+  const [showHalfChoice, setShowHalfChoice] = useState<Product | null>(null);
   const [editingProduct, setEditingProduct] = useState<EditingProduct | null>(null);
   const [lastOrderId, setLastOrderId] = useState<number | null>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
