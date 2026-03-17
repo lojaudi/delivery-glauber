@@ -32,7 +32,7 @@ serve(async (req) => {
     // Get store config for instance name
     const { data: storeConfig } = await supabaseAdmin
       .from('store_config')
-      .select('evolution_instance_name, name')
+      .select('evolution_instance_name, name, custom_domain')
       .eq('restaurant_id', restaurant_id)
       .single();
 
