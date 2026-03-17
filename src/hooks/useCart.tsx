@@ -89,26 +89,39 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeItem = (productId: string) => {
+  const removeItem = (productId: string, halfHalfSecondId?: string) => {
     setCartData(prev => ({
       ...prev,
-      items: prev.items.filter(item => item.product.id !== productId),
+      items: prev.items.filter(item => {
+        if (halfHalfSecondId && item.halfHalf) {
+          return !(item.product.id === productId && item.halfHalf.secondProduct.id === halfHalfSecondId);
+        }
+        if (!halfHalfSecondId && !item.halfHalf) {
+          return item.product.id !== productId;
+        }
+        return true;
+      }),
     }));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, halfHalfSecondId?: string) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      removeItem(productId, halfHalfSecondId);
       return;
     }
     
     setCartData(prev => ({
       ...prev,
-      items: prev.items.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
-      ),
+      items: prev.items.map(item => {
+        if (halfHalfSecondId && item.halfHalf) {
+          if (item.product.id === productId && item.halfHalf.secondProduct.id === halfHalfSecondId) {
+            return { ...item, quantity };
+          }
+        } else if (!halfHalfSecondId && !item.halfHalf && item.product.id === productId) {
+          return { ...item, quantity };
+        }
+        return item;
+      }),
     }));
   };
 
