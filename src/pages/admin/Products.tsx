@@ -53,6 +53,7 @@ const AdminProducts = () => {
     image_url: '',
     is_available: true,
     is_featured: false,
+    allows_half: false,
   });
   const [selectedAddonGroups, setSelectedAddonGroups] = useState<string[]>([]);
   const [initialAddonGroups, setInitialAddonGroups] = useState<string[]>([]);
