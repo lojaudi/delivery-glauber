@@ -148,7 +148,7 @@ const Cart = () => {
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 {/* Remove Button */}
                 <button
-                  onClick={() => removeItem(item.product.id)}
+                  onClick={() => removeItem(item.product.id, item.halfHalf?.secondProduct?.id)}
                   className="flex items-center gap-1.5 text-sm text-destructive font-medium hover:text-destructive/80"
                 >
                   <Trash2 className="h-4 w-4" />
