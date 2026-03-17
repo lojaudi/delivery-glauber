@@ -135,6 +135,24 @@ export function BrandSettings({ className }: BrandSettingsProps) {
           </div>
         </div>
 
+        {/* Custom Domain */}
+        <div className="border-t pt-6 space-y-4">
+          <h4 className="font-medium text-sm">Domínio Personalizado</h4>
+          <div className="space-y-2">
+            <Label className="text-xs sm:text-sm text-muted-foreground">
+              URL do seu estabelecimento (com https://)
+            </Label>
+            <Input
+              value={formData.custom_domain}
+              onChange={(e) => setFormData({ ...formData, custom_domain: e.target.value })}
+              placeholder="https://meurestaurante.com.br"
+            />
+            <p className="text-xs text-muted-foreground">
+              Este domínio será usado nos links enviados via WhatsApp para entregadores e clientes.
+            </p>
+          </div>
+        </div>
+
         {/* PWA Settings */}
         <div className="border-t pt-6 space-y-4">
           <h4 className="font-medium text-sm">Configurações do App Instalável (PWA)</h4>
