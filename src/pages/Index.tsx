@@ -139,9 +139,24 @@ const Index = () => {
     }
   };
 
+  const handleProductSelect = (product: Product) => {
+    // Check if product allows half-and-half and there are other half-compatible products in the same category
+    const sameCatHalfProducts = products?.filter(p => 
+      p.category_id === product.category_id && p.allows_half && p.is_available && p.id !== product.id
+    ) || [];
+
+    if (product.allows_half && sameCatHalfProducts.length > 0) {
+      setShowHalfChoice(product);
+    } else {
+      setSelectedProduct(product);
+    }
+  };
+
   const handleCloseModal = () => {
     setSelectedProduct(null);
     setEditingProduct(null);
+    setHalfHalfProduct(null);
+    setShowHalfChoice(null);
   };
 
   if (isLoading) {
