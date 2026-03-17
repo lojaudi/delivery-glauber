@@ -160,7 +160,7 @@ const Cart = () => {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1), item.halfHalf?.secondProduct?.id)}
                     className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80"
                     disabled={item.quantity <= 1}
                   >
