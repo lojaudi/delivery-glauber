@@ -33,6 +33,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
         cover_url: store.cover_url || '',
         pwa_name: store.pwa_name || store.name || '',
         pwa_short_name: store.pwa_short_name || '',
+        custom_domain: store.custom_domain || '',
       });
     }
   }, [store]);
