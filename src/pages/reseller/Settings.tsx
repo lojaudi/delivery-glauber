@@ -35,6 +35,7 @@ function SettingsContent() {
         email: reseller.email || '',
         phone: reseller.phone || '',
         company_name: reseller.company_name || '',
+        platform_name: (reseller as any).platform_name || '',
       });
     }
   }, [reseller]);
