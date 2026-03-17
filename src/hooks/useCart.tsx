@@ -10,7 +10,7 @@ interface CartStorageData {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => void;
+  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
