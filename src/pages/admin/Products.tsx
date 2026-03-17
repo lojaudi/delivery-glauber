@@ -484,6 +484,22 @@ const AdminProducts = () => {
               </Label>
             </div>
 
+            {/* Allows Half Toggle */}
+            <div className="flex items-center space-x-3 bg-muted/50 rounded-lg p-3">
+              <Checkbox
+                id="allows_half"
+                checked={formData.allows_half}
+                onCheckedChange={(checked) => setFormData({ ...formData, allows_half: !!checked })}
+              />
+              <Label htmlFor="allows_half" className="text-sm font-normal cursor-pointer flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Pizza className="h-4 w-4 text-primary" />
+                  <span>Permite meio a meio</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Clientes poderão escolher 2 sabores desta categoria</p>
+              </Label>
+            </div>
+
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Cancelar
