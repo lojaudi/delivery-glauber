@@ -25,6 +25,7 @@ function SettingsContent() {
     email: '',
     phone: '',
     company_name: '',
+    platform_name: '',
   });
 
   useEffect(() => {
