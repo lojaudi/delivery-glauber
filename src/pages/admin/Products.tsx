@@ -235,6 +235,7 @@ const AdminProducts = () => {
         image_url: product.image_url,
         is_available: product.is_available,
         is_featured: false,
+        allows_half: product.allows_half || false,
       });
       toast({ title: 'Produto duplicado!' });
     } catch (error: any) {
