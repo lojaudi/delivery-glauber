@@ -172,7 +172,7 @@ const Cart = () => {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.halfHalf?.secondProduct?.id)}
                     className="h-8 w-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <Plus className="h-4 w-4" />
