@@ -275,7 +275,7 @@ const Index = () => {
               ref={(el) => { sectionRefs.current[category.id] = el; }}
               category={category}
               products={products}
-              onProductSelect={setSelectedProduct}
+              onProductSelect={handleProductSelect}
             />
           ))}
 
