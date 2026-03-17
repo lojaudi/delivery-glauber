@@ -19,6 +19,12 @@ export interface CartItem {
   quantity: number;
   observation?: string;
   selectedAddons?: Record<string, string[]>; // groupId -> optionIds
+  halfProduct?: {
+    id: string;
+    name: string;
+    price: number;
+    image_url?: string;
+  };
 }
 
 export interface StoreConfig {
