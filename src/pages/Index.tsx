@@ -7,6 +7,7 @@ import { CategoryIcons } from '@/components/menu/CategoryIcons';
 import { MenuSection } from '@/components/menu/MenuSection';
 import { FeaturedCarousel } from '@/components/menu/FeaturedCarousel';
 import { ProductModal } from '@/components/menu/ProductModal';
+import { HalfHalfModal } from '@/components/menu/HalfHalfModal';
 import { CartButton } from '@/components/cart/CartButton';
 import { FloatingOrderButton, getLastOrderId } from '@/components/order/FloatingOrderButton';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
