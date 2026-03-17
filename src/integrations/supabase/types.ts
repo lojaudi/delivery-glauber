@@ -805,6 +805,7 @@ export type Database = {
           mp_webhook_secret: string | null
           name: string
           phone: string | null
+          platform_name: string | null
           primary_color: string | null
           secondary_color: string | null
           slug: string | null
@@ -829,6 +830,7 @@ export type Database = {
           mp_webhook_secret?: string | null
           name: string
           phone?: string | null
+          platform_name?: string | null
           primary_color?: string | null
           secondary_color?: string | null
           slug?: string | null
@@ -853,6 +855,7 @@ export type Database = {
           mp_webhook_secret?: string | null
           name?: string
           phone?: string | null
+          platform_name?: string | null
           primary_color?: string | null
           secondary_color?: string | null
           slug?: string | null
