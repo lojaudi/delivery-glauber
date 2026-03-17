@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Product } from '@/types';
+import { CartItem, Product, HalfHalfInfo } from '@/types';
 
 const CART_STORAGE_KEY = 'delivery-cart';
 
