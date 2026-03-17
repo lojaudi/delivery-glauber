@@ -65,6 +65,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CampaignSenderProvider>
+        <DynamicPageTitle />
         <CartProvider>
           <TooltipProvider>
             <Toaster />
