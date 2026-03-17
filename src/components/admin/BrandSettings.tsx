@@ -22,6 +22,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
     cover_url: '',
     pwa_name: '',
     pwa_short_name: '',
+    custom_domain: '',
   });
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
         cover_url: store.cover_url || '',
         pwa_name: store.pwa_name || store.name || '',
         pwa_short_name: store.pwa_short_name || '',
+        custom_domain: store.custom_domain || '',
       });
     }
   }, [store]);
@@ -48,6 +50,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
         cover_url: formData.cover_url || null,
         pwa_name: formData.pwa_name || formData.name,
         pwa_short_name: formData.pwa_short_name || formData.pwa_name?.slice(0, 12) || formData.name.slice(0, 12),
+        custom_domain: formData.custom_domain || null,
       });
       toast({ title: 'Marca atualizada com sucesso!' });
     } catch (error: any) {
@@ -129,6 +132,24 @@ export function BrandSettings({ className }: BrandSettingsProps) {
             <div>
               <p className="font-semibold">{formData.name || 'Nome do Restaurante'}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Custom Domain */}
+        <div className="border-t pt-6 space-y-4">
+          <h4 className="font-medium text-sm">Domínio Personalizado</h4>
+          <div className="space-y-2">
+            <Label className="text-xs sm:text-sm text-muted-foreground">
+              URL do seu estabelecimento (com https://)
+            </Label>
+            <Input
+              value={formData.custom_domain}
+              onChange={(e) => setFormData({ ...formData, custom_domain: e.target.value })}
+              placeholder="https://meurestaurante.com.br"
+            />
+            <p className="text-xs text-muted-foreground">
+              Este domínio será usado nos links enviados via WhatsApp para entregadores e clientes.
+            </p>
           </div>
         </div>
 

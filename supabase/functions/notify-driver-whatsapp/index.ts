@@ -32,7 +32,7 @@ serve(async (req) => {
     // Get store config for instance name
     const { data: storeConfig } = await supabaseAdmin
       .from('store_config')
-      .select('evolution_instance_name, name')
+      .select('evolution_instance_name, name, custom_domain')
       .eq('restaurant_id', restaurant_id)
       .single();
 
@@ -64,9 +64,19 @@ serve(async (req) => {
 
     const formattedTotal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(total_amount));
 
-    // Build the driver access link using the actual app domain
-    const appBaseUrl = base_url || 'https://delivery-glauber.lovable.app';
-    const driverLink = slug ? `${appBaseUrl}/r/${slug}/driver` : '';
+    // Build the driver access link using the restaurant's own domain
+    let driverLink = '';
+    if (slug) {
+      if (storeConfig.custom_domain) {
+        // If restaurant has a custom domain, use it directly
+        const domain = storeConfig.custom_domain.replace(/\/$/, '');
+        driverLink = `${domain}/r/${slug}/driver`;
+      } else {
+        // Fallback to the base_url passed from frontend, or default
+        const fallbackUrl = base_url || 'https://delivery-glauber.lovable.app';
+        driverLink = `${fallbackUrl}/r/${slug}/driver`;
+      }
+    }
 
     const message = `🚚 *Nova Entrega Disponível!*\n\n` +
       `📋 *${storeConfig.name}*\n` +

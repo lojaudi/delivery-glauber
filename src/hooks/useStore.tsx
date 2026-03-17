@@ -31,6 +31,7 @@ export interface StoreConfig {
   restaurant_id: string | null;
   timezone: string | null;
   evolution_instance_name: string | null;
+  custom_domain: string | null;
 }
 
 export function useStoreConfig() {

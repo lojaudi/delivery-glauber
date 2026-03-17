@@ -1,0 +1,1 @@
+ALTER TABLE public.store_config ADD COLUMN custom_domain text DEFAULT NULL;

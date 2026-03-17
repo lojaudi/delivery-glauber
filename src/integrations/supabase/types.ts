@@ -993,6 +993,7 @@ export type Database = {
           address: string | null
           cover_url: string | null
           created_at: string
+          custom_domain: string | null
           delivery_fee: number
           delivery_fee_mode: string
           delivery_time_max: number
@@ -1026,6 +1027,7 @@ export type Database = {
           address?: string | null
           cover_url?: string | null
           created_at?: string
+          custom_domain?: string | null
           delivery_fee?: number
           delivery_fee_mode?: string
           delivery_time_max?: number
@@ -1059,6 +1061,7 @@ export type Database = {
           address?: string | null
           cover_url?: string | null
           created_at?: string
+          custom_domain?: string | null
           delivery_fee?: number
           delivery_fee_mode?: string
           delivery_time_max?: number
