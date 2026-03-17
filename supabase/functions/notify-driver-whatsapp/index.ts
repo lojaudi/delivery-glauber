@@ -17,7 +17,7 @@ serve(async (req) => {
   );
 
   try {
-    const { order_id, customer_name, total_amount, payment_method, address, restaurant_id, slug } = await req.json();
+    const { order_id, customer_name, total_amount, payment_method, address, restaurant_id, slug, base_url } = await req.json();
 
     const evolutionUrl = Deno.env.get('EVOLUTION_API_URL');
     const evolutionKey = Deno.env.get('EVOLUTION_API_KEY');
@@ -64,9 +64,9 @@ serve(async (req) => {
 
     const formattedTotal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(total_amount));
 
-    // Build the driver access link
-    const appUrl = Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '');
-    const driverLink = slug ? `https://delivery-glauber.lovable.app/r/${slug}/driver` : '';
+    // Build the driver access link using the actual app domain
+    const appBaseUrl = base_url || 'https://delivery-glauber.lovable.app';
+    const driverLink = slug ? `${appBaseUrl}/r/${slug}/driver` : '';
 
     const message = `🚚 *Nova Entrega Disponível!*\n\n` +
       `📋 *${storeConfig.name}*\n` +

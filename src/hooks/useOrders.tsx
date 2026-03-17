@@ -356,6 +356,7 @@ export function useUpdateOrderStatus() {
               address: fullAddress,
               restaurant_id: restaurantId,
               slug: restaurant?.slug || '',
+              base_url: window.location.origin,
             },
           }).catch((err) => {
             console.warn('Driver WhatsApp notification failed:', err);
