@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Product } from '@/types';
+import { CartItem, Product, HalfHalfInfo } from '@/types';
 
 const CART_STORAGE_KEY = 'delivery-cart';
 
@@ -10,9 +10,9 @@ interface CartStorageData {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => void;
+  removeItem: (productId: string, halfHalfSecondId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, halfHalfSecondId?: string) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -59,9 +59,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cartData);
   }, [cartData]);
 
-  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => {
+  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => {
     setCartData(prev => {
-      const existingIndex = prev.items.findIndex(item => item.product.id === product.id);
+      // For half-half items, use a composite key
+      const itemKey = halfHalf 
+        ? `${product.id}_half_${halfHalf.secondProduct.id}` 
+        : product.id;
+      
+      const existingIndex = prev.items.findIndex(item => {
+        if (item.halfHalf && halfHalf) {
+          return item.product.id === product.id && item.halfHalf.secondProduct.id === halfHalf.secondProduct.id;
+        }
+        return !item.halfHalf && item.product.id === product.id;
+      });
       
       if (existingIndex > -1) {
         const updatedItems = [...prev.items];
@@ -70,34 +80,48 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingIndex].quantity + quantity,
           observation: observation || updatedItems[existingIndex].observation,
           selectedAddons: selectedAddons || updatedItems[existingIndex].selectedAddons,
+          halfHalf: halfHalf || updatedItems[existingIndex].halfHalf,
         };
         return { ...prev, items: updatedItems };
       }
       
-      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons }] };
+      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, halfHalf }] };
     });
   };
 
-  const removeItem = (productId: string) => {
+  const removeItem = (productId: string, halfHalfSecondId?: string) => {
     setCartData(prev => ({
       ...prev,
-      items: prev.items.filter(item => item.product.id !== productId),
+      items: prev.items.filter(item => {
+        if (halfHalfSecondId && item.halfHalf) {
+          return !(item.product.id === productId && item.halfHalf.secondProduct.id === halfHalfSecondId);
+        }
+        if (!halfHalfSecondId && !item.halfHalf) {
+          return item.product.id !== productId;
+        }
+        return true;
+      }),
     }));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number, halfHalfSecondId?: string) => {
     if (quantity <= 0) {
-      removeItem(productId);
+      removeItem(productId, halfHalfSecondId);
       return;
     }
     
     setCartData(prev => ({
       ...prev,
-      items: prev.items.map(item => 
-        item.product.id === productId 
-          ? { ...item, quantity } 
-          : item
-      ),
+      items: prev.items.map(item => {
+        if (halfHalfSecondId && item.halfHalf) {
+          if (item.product.id === productId && item.halfHalf.secondProduct.id === halfHalfSecondId) {
+            return { ...item, quantity };
+          }
+        } else if (!halfHalfSecondId && !item.halfHalf && item.product.id === productId) {
+          return { ...item, quantity };
+        }
+        return item;
+      }),
     }));
   };
 

@@ -67,35 +67,71 @@ const Cart = () => {
 
         {/* Cart Items */}
         <div className="p-4 space-y-4">
-          {items.map((item) => (
-            <div key={item.product.id} className="bg-card rounded-2xl p-4 shadow-card">
+          {items.map((item, index) => (
+            <div key={`${item.product.id}-${item.halfHalf?.secondProduct?.id || index}`} className="bg-card rounded-2xl p-4 shadow-card">
               <div className="flex gap-3">
                 {/* Product Image */}
-                <img
-                  src={item.product.image_url || '/placeholder.svg'}
-                  alt={item.product.name}
-                  className="h-16 w-16 shrink-0 rounded-xl object-cover"
-                />
+                <div className="relative h-16 w-16 shrink-0">
+                  {item.halfHalf ? (
+                    <div className="h-16 w-16 rounded-xl overflow-hidden relative">
+                      <img
+                        src={item.product.image_url || '/placeholder.svg'}
+                        alt={item.product.name}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        style={{ clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' }}
+                      />
+                      <img
+                        src={item.halfHalf.secondProduct.image_url || '/placeholder.svg'}
+                        alt={item.halfHalf.secondProduct.name}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        style={{ clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)' }}
+                      />
+                      <div className="absolute inset-0 border-r border-background/50" style={{ left: '50%', width: '2px' }} />
+                    </div>
+                  ) : (
+                    <img
+                      src={item.product.image_url || '/placeholder.svg'}
+                      alt={item.product.name}
+                      className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                    />
+                  )}
+                </div>
                 
                 {/* Product Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-foreground truncate">{item.product.name}</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="icon-sm" 
-                      className="shrink-0 text-muted-foreground hover:text-primary"
-                      onClick={() => {
-                        const addonsParam = item.selectedAddons 
-                          ? encodeURIComponent(JSON.stringify(item.selectedAddons))
-                          : '';
-                        const url = `${basePath}/?product=${item.product.id}&observation=${encodeURIComponent(item.observation || '')}&quantity=${item.quantity}&returnTo=cart${addonsParam ? `&addons=${addonsParam}` : ''}`;
-                        navigate(url);
-                      }}
-                      aria-label="Editar produto"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    <div className="min-w-0">
+                      {item.halfHalf ? (
+                        <>
+                          <h3 className="font-semibold text-foreground text-sm">🍕 Meio a Meio</h3>
+                          <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                            ½ {item.product.name.replace(/^½\s*/, '').split(' + ')[0]}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            ½ {item.halfHalf.secondProduct.name}
+                          </p>
+                        </>
+                      ) : (
+                        <h3 className="font-semibold text-foreground truncate">{item.product.name}</h3>
+                      )}
+                    </div>
+                    {!item.halfHalf && (
+                      <Button 
+                        variant="ghost" 
+                        size="icon-sm" 
+                        className="shrink-0 text-muted-foreground hover:text-primary"
+                        onClick={() => {
+                          const addonsParam = item.selectedAddons 
+                            ? encodeURIComponent(JSON.stringify(item.selectedAddons))
+                            : '';
+                          const url = `${basePath}/?product=${item.product.id}&observation=${encodeURIComponent(item.observation || '')}&quantity=${item.quantity}&returnTo=cart${addonsParam ? `&addons=${addonsParam}` : ''}`;
+                          navigate(url);
+                        }}
+                        aria-label="Editar produto"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                   {item.observation && (
                     <p className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -112,7 +148,7 @@ const Cart = () => {
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 {/* Remove Button */}
                 <button
-                  onClick={() => removeItem(item.product.id)}
+                  onClick={() => removeItem(item.product.id, item.halfHalf?.secondProduct?.id)}
                   className="flex items-center gap-1.5 text-sm text-destructive font-medium hover:text-destructive/80"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -124,7 +160,7 @@ const Cart = () => {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1), item.halfHalf?.secondProduct?.id)}
                     className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80"
                     disabled={item.quantity <= 1}
                   >
@@ -136,7 +172,7 @@ const Cart = () => {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.halfHalf?.secondProduct?.id)}
                     className="h-8 w-8 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
                   >
                     <Plus className="h-4 w-4" />

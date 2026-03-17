@@ -14,11 +14,22 @@ export interface Product {
   is_available: boolean;
 }
 
+export interface HalfHalfInfo {
+  isHalfHalf: true;
+  secondProduct: {
+    id: string;
+    name: string;
+    price: number;
+    image_url: string;
+  };
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
   observation?: string;
   selectedAddons?: Record<string, string[]>; // groupId -> optionIds
+  halfHalf?: HalfHalfInfo;
 }
 
 export interface StoreConfig {

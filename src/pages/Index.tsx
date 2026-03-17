@@ -7,6 +7,7 @@ import { CategoryIcons } from '@/components/menu/CategoryIcons';
 import { MenuSection } from '@/components/menu/MenuSection';
 import { FeaturedCarousel } from '@/components/menu/FeaturedCarousel';
 import { ProductModal } from '@/components/menu/ProductModal';
+import { HalfHalfModal } from '@/components/menu/HalfHalfModal';
 import { CartButton } from '@/components/cart/CartButton';
 import { FloatingOrderButton, getLastOrderId } from '@/components/order/FloatingOrderButton';
 import { InstallPrompt } from '@/components/pwa/InstallPrompt';
@@ -33,6 +34,8 @@ const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [halfHalfProduct, setHalfHalfProduct] = useState<Product | null>(null);
+  const [showHalfChoice, setShowHalfChoice] = useState<Product | null>(null);
   const [editingProduct, setEditingProduct] = useState<EditingProduct | null>(null);
   const [lastOrderId, setLastOrderId] = useState<number | null>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -136,9 +139,24 @@ const Index = () => {
     }
   };
 
+  const handleProductSelect = (product: Product) => {
+    // Check if product allows half-and-half and there are other half-compatible products in the same category
+    const sameCatHalfProducts = products?.filter(p => 
+      p.category_id === product.category_id && p.allows_half && p.is_available && p.id !== product.id
+    ) || [];
+
+    if (product.allows_half && sameCatHalfProducts.length > 0) {
+      setShowHalfChoice(product);
+    } else {
+      setSelectedProduct(product);
+    }
+  };
+
   const handleCloseModal = () => {
     setSelectedProduct(null);
     setEditingProduct(null);
+    setHalfHalfProduct(null);
+    setShowHalfChoice(null);
   };
 
   if (isLoading) {
@@ -226,7 +244,7 @@ const Index = () => {
         {featuredProducts.length > 0 && !searchQuery && (
           <FeaturedCarousel
             products={featuredProducts}
-            onProductSelect={setSelectedProduct}
+            onProductSelect={handleProductSelect}
           />
         )}
 
@@ -257,7 +275,7 @@ const Index = () => {
               ref={(el) => { sectionRefs.current[category.id] = el; }}
               category={category}
               products={products}
-              onProductSelect={setSelectedProduct}
+              onProductSelect={handleProductSelect}
             />
           ))}
 
@@ -303,6 +321,56 @@ const Index = () => {
             initialAddons={editingProduct?.selectedAddons}
             isEditing={isEditing}
             returnTo={editingProduct?.returnTo}
+          />
+        )}
+
+        {/* Half choice dialog */}
+        {showHalfChoice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-sm">
+            <div className="absolute inset-0" onClick={handleCloseModal} />
+            <div className="relative w-[90%] max-w-sm bg-background rounded-3xl p-6 animate-scale-in">
+              <h3 className="text-lg font-bold text-foreground text-center mb-1">Como deseja seu pedido?</h3>
+              <p className="text-sm text-muted-foreground text-center mb-6">{showHalfChoice.name}</p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    const p = showHalfChoice;
+                    setShowHalfChoice(null);
+                    setSelectedProduct(p);
+                  }}
+                  className="w-full flex items-center gap-4 rounded-2xl border-2 border-border p-4 hover:border-primary/30 transition-colors text-left"
+                >
+                  <span className="text-3xl">🍕</span>
+                  <div>
+                    <p className="font-semibold text-foreground">Pizza Inteira</p>
+                    <p className="text-xs text-muted-foreground">Um único sabor</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    const p = showHalfChoice;
+                    setShowHalfChoice(null);
+                    setHalfHalfProduct(p);
+                  }}
+                  className="w-full flex items-center gap-4 rounded-2xl border-2 border-primary bg-primary/5 p-4 hover:bg-primary/10 transition-colors text-left"
+                >
+                  <span className="text-3xl">🍕</span>
+                  <div>
+                    <p className="font-semibold text-foreground">Meio a Meio</p>
+                    <p className="text-xs text-muted-foreground">Escolha 2 sabores</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Half-and-half modal */}
+        {halfHalfProduct && (
+          <HalfHalfModal
+            product={halfHalfProduct}
+            sameCategoryProducts={products?.filter(p => p.category_id === halfHalfProduct.category_id) || []}
+            onClose={handleCloseModal}
           />
         )}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star, Copy } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star, Copy, Pizza } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -53,6 +53,7 @@ const AdminProducts = () => {
     image_url: '',
     is_available: true,
     is_featured: false,
+    allows_half: false,
   });
   const [selectedAddonGroups, setSelectedAddonGroups] = useState<string[]>([]);
   const [initialAddonGroups, setInitialAddonGroups] = useState<string[]>([]);
@@ -83,6 +84,7 @@ const AdminProducts = () => {
       image_url: '',
       is_available: true,
       is_featured: false,
+      allows_half: false,
     });
     setSelectedAddonGroups([]);
     setIsModalOpen(true);
@@ -98,6 +100,7 @@ const AdminProducts = () => {
       image_url: product.image_url || '',
       is_available: product.is_available,
       is_featured: product.is_featured || false,
+      allows_half: product.allows_half || false,
     });
     setIsModalOpen(true);
     
@@ -153,6 +156,7 @@ const AdminProducts = () => {
         image_url: formData.image_url || null,
         is_available: formData.is_available,
         is_featured: formData.is_featured,
+        allows_half: formData.allows_half,
       };
 
       let productId: string;
@@ -231,6 +235,7 @@ const AdminProducts = () => {
         image_url: product.image_url,
         is_available: product.is_available,
         is_featured: false,
+        allows_half: product.allows_half || false,
       });
       toast({ title: 'Produto duplicado!' });
     } catch (error: any) {
@@ -476,6 +481,22 @@ const AdminProducts = () => {
                   <span>Produto destaque</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">Exibido no carrossel de destaques (máx. 10)</p>
+              </Label>
+            </div>
+
+            {/* Allows Half Toggle */}
+            <div className="flex items-center space-x-3 bg-muted/50 rounded-lg p-3">
+              <Checkbox
+                id="allows_half"
+                checked={formData.allows_half}
+                onCheckedChange={(checked) => setFormData({ ...formData, allows_half: !!checked })}
+              />
+              <Label htmlFor="allows_half" className="text-sm font-normal cursor-pointer flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Pizza className="h-4 w-4 text-primary" />
+                  <span>Permite meio a meio</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Clientes poderão escolher 2 sabores desta categoria</p>
               </Label>
             </div>
 
