@@ -59,9 +59,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cartData);
   }, [cartData]);
 
-  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => {
+  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => {
     setCartData(prev => {
-      const existingIndex = prev.items.findIndex(item => item.product.id === product.id);
+      // For half-half items, use a composite key
+      const itemKey = halfHalf 
+        ? `${product.id}_half_${halfHalf.secondProduct.id}` 
+        : product.id;
+      
+      const existingIndex = prev.items.findIndex(item => {
+        if (item.halfHalf && halfHalf) {
+          return item.product.id === product.id && item.halfHalf.secondProduct.id === halfHalf.secondProduct.id;
+        }
+        return !item.halfHalf && item.product.id === product.id;
+      });
       
       if (existingIndex > -1) {
         const updatedItems = [...prev.items];
@@ -70,11 +80,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingIndex].quantity + quantity,
           observation: observation || updatedItems[existingIndex].observation,
           selectedAddons: selectedAddons || updatedItems[existingIndex].selectedAddons,
+          halfHalf: halfHalf || updatedItems[existingIndex].halfHalf,
         };
         return { ...prev, items: updatedItems };
       }
       
-      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons }] };
+      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, halfHalf }] };
     });
   };
 
