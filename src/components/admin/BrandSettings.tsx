@@ -50,6 +50,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
         cover_url: formData.cover_url || null,
         pwa_name: formData.pwa_name || formData.name,
         pwa_short_name: formData.pwa_short_name || formData.pwa_name?.slice(0, 12) || formData.name.slice(0, 12),
+        custom_domain: formData.custom_domain || null,
       });
       toast({ title: 'Marca atualizada com sucesso!' });
     } catch (error: any) {
