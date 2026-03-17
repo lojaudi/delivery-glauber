@@ -22,6 +22,7 @@ export function BrandSettings({ className }: BrandSettingsProps) {
     cover_url: '',
     pwa_name: '',
     pwa_short_name: '',
+    custom_domain: '',
   });
 
   useEffect(() => {
