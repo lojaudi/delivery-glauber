@@ -734,6 +734,7 @@ export type Database = {
       }
       products: {
         Row: {
+          allows_half: boolean
           category_id: string | null
           created_at: string
           description: string | null
@@ -746,6 +747,7 @@ export type Database = {
           restaurant_id: string | null
         }
         Insert: {
+          allows_half?: boolean
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -758,6 +760,7 @@ export type Database = {
           restaurant_id?: string | null
         }
         Update: {
+          allows_half?: boolean
           category_id?: string | null
           created_at?: string
           description?: string | null
