@@ -17,7 +17,7 @@ serve(async (req) => {
   );
 
   try {
-    const { order_id, customer_name, total_amount, payment_method, address, restaurant_id, slug } = await req.json();
+    const { order_id, customer_name, total_amount, payment_method, address, restaurant_id, slug, base_url } = await req.json();
 
     const evolutionUrl = Deno.env.get('EVOLUTION_API_URL');
     const evolutionKey = Deno.env.get('EVOLUTION_API_KEY');
