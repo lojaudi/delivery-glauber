@@ -156,6 +156,7 @@ const AdminProducts = () => {
         image_url: formData.image_url || null,
         is_available: formData.is_available,
         is_featured: formData.is_featured,
+        allows_half: formData.allows_half,
       };
 
       let productId: string;
