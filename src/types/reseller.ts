@@ -27,6 +27,8 @@ export interface Reseller {
   landing_page_whatsapp?: string | null;
   landing_page_email?: string | null;
   landing_page_enabled?: boolean;
+  // Platform branding
+  platform_name?: string | null;
 }
 
 export interface SubscriptionPlan {

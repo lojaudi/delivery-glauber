@@ -110,6 +110,19 @@ function SettingsContent() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="platform_name">Nome da Plataforma (título do sistema)</Label>
+                <Input
+                  id="platform_name"
+                  value={formData.platform_name}
+                  onChange={(e) => setFormData({ ...formData, platform_name: e.target.value })}
+                  placeholder="Ex: Minha Plataforma Delivery"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Este nome aparece como título da aba do navegador e no SEO do sistema.
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="company_name">Nome da Empresa</Label>
                 <Input
                   id="company_name"
