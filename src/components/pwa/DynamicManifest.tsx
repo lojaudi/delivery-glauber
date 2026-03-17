@@ -56,9 +56,6 @@ export function DynamicManifest() {
     link.href = manifestUrl;
     document.head.appendChild(link);
 
-    // Update document title
-    document.title = store.pwa_name || store.name || 'Cardápio Digital';
-
     // Update theme-color meta tag
     let themeMeta = document.querySelector('meta[name="theme-color"]');
     if (themeMeta) {
