@@ -244,7 +244,7 @@ const Index = () => {
         {featuredProducts.length > 0 && !searchQuery && (
           <FeaturedCarousel
             products={featuredProducts}
-            onProductSelect={setSelectedProduct}
+            onProductSelect={handleProductSelect}
           />
         )}
 
