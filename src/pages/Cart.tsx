@@ -80,12 +80,7 @@ const Cart = () => {
                 {/* Product Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-semibold text-foreground truncate">
-                      {item.halfProduct 
-                        ? `½ ${item.product.name} + ½ ${item.halfProduct.name}`
-                        : item.product.name
-                      }
-                    </h3>
+                    <h3 className="font-semibold text-foreground truncate">{item.product.name}</h3>
                     <Button 
                       variant="ghost" 
                       size="icon-sm" 

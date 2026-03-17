@@ -10,7 +10,7 @@ interface CartStorageData {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfProduct?: CartItem['halfProduct']) => void;
+  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -59,7 +59,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cartData);
   }, [cartData]);
 
-  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfProduct?: CartItem['halfProduct']) => {
+  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>) => {
     setCartData(prev => {
       const existingIndex = prev.items.findIndex(item => item.product.id === product.id);
       
@@ -70,12 +70,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingIndex].quantity + quantity,
           observation: observation || updatedItems[existingIndex].observation,
           selectedAddons: selectedAddons || updatedItems[existingIndex].selectedAddons,
-          halfProduct: halfProduct || updatedItems[existingIndex].halfProduct,
         };
         return { ...prev, items: updatedItems };
       }
       
-      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, halfProduct }] };
+      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons }] };
     });
   };
 

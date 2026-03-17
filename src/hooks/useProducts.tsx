@@ -12,7 +12,6 @@ export interface Product {
   image_url: string | null;
   is_available: boolean;
   is_featured: boolean;
-  allows_half: boolean;
   restaurant_id?: string | null;
 }
 
