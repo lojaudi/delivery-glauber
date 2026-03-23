@@ -122,7 +122,7 @@ export default function DriverAccess() {
     localStorage.setItem('driver_id', driverId);
     localStorage.setItem('driver_name', driverName);
     localStorage.setItem('driver_restaurant_id', restaurantId!);
-    setTimeout(() => navigate(`/r/${slug}/driver/dashboard`), 300);
+    setTimeout(() => navigate(`/${slug}/driver/dashboard`), 300);
   };
 
   const handleBackToList = () => {
@@ -181,7 +181,7 @@ export default function DriverAccess() {
             ) : drivers.length === 0 ? (
               <div className="text-center py-8">
                 <p className="text-muted-foreground mb-4">Nenhum entregador cadastrado ainda.</p>
-                <Button variant="outline" onClick={() => navigate(`/r/${slug}`)}>Voltar ao cardápio</Button>
+                <Button variant="outline" onClick={() => navigate(`/${slug}`)}>Voltar ao cardápio</Button>
               </div>
             ) : (
               <div className="grid gap-3">

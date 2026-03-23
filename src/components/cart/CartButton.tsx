@@ -7,7 +7,7 @@ export function CartButton() {
   const { totalItems } = useCart();
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
-  const basePath = slug ? `/r/${slug}` : '';
+  const basePath = slug ? `/${slug}` : '';
 
   if (totalItems === 0) return null;
 

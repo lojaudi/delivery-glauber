@@ -70,11 +70,11 @@ serve(async (req) => {
       if (storeConfig.custom_domain) {
         // If restaurant has a custom domain, use it directly
         const domain = storeConfig.custom_domain.replace(/\/$/, '');
-        driverLink = `${domain}/r/${slug}/driver`;
+        driverLink = `${domain}/${slug}/driver`;
       } else {
         // Fallback to the base_url passed from frontend, or default
         const fallbackUrl = base_url || 'https://delivery-glauber.lovable.app';
-        driverLink = `${fallbackUrl}/r/${slug}/driver`;
+        driverLink = `${fallbackUrl}/${slug}/driver`;
       }
     }
 

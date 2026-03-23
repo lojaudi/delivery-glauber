@@ -61,7 +61,7 @@ export default function DriverDashboard() {
 
   useEffect(() => {
     if (!driverId || !driverName) {
-      navigate(slug ? `/r/${slug}/driver` : '/');
+      navigate(slug ? `/${slug}/driver` : '/');
     }
   }, [driverId, driverName, navigate, slug]);
 
@@ -234,7 +234,7 @@ export default function DriverDashboard() {
     localStorage.removeItem('driver_id');
     localStorage.removeItem('driver_name');
     localStorage.removeItem('driver_restaurant_id');
-    navigate(slug ? `/r/${slug}/driver` : '/');
+    navigate(slug ? `/${slug}/driver` : '/');
   };
 
   const formatCurrency = (v: number) =>

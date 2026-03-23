@@ -90,9 +90,9 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Determine base paths based on slug
-  const basePath = slug ? `/r/${slug}/admin` : '/admin';
-  const menuPath = slug ? `/r/${slug}` : '/';
-  const authPath = slug ? `/r/${slug}/auth` : '/auth';
+  const basePath = slug ? `/${slug}/admin` : '/admin';
+  const menuPath = slug ? `/${slug}` : '/';
+  const authPath = slug ? `/${slug}/auth` : '/auth';
   
   // Generate nav groups with correct paths
   const navGroups = getNavGroups(basePath, menuPath);

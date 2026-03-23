@@ -154,7 +154,7 @@ export default function WaiterAccess() {
     localStorage.setItem('waiter_name', waiterName);
     
     setTimeout(() => {
-      navigate(`/r/${slug}/waiter/dashboard`);
+      navigate(`/${slug}/waiter/dashboard`);
     }, 300);
   };
 
@@ -243,7 +243,7 @@ export default function WaiterAccess() {
                 <p className="text-muted-foreground mb-4">
                   Nenhum garçom cadastrado ainda.
                 </p>
-                <Button variant="outline" onClick={() => navigate(`/r/${slug}`)}>
+                <Button variant="outline" onClick={() => navigate(`/${slug}`)}>
                   Voltar ao cardápio
                 </Button>
               </div>

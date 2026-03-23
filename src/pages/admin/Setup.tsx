@@ -26,7 +26,7 @@ const AdminSetup = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const basePath = slug ? `/r/${slug}/admin` : '/admin';
+  const basePath = slug ? `/${slug}/admin` : '/admin';
   const { data: store, isLoading } = useStoreConfig();
   const updateStore = useUpdateStoreConfig();
   const [currentStep, setCurrentStep] = useState(0);

@@ -50,14 +50,14 @@ export default function WaiterDashboard() {
 
   useEffect(() => {
     if (!waiterId || !waiterName) {
-      navigate(slug ? `/r/${slug}/waiter` : '/waiter');
+      navigate(slug ? `/${slug}/waiter` : '/waiter');
     }
   }, [waiterId, waiterName, navigate, slug]);
 
   const handleLogout = () => {
     localStorage.removeItem('waiter_id');
     localStorage.removeItem('waiter_name');
-    navigate(slug ? `/r/${slug}/waiter` : '/waiter');
+    navigate(slug ? `/${slug}/waiter` : '/waiter');
   };
 
   const handleTableClick = (table: TableWithOrder) => {

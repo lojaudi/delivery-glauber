@@ -78,14 +78,14 @@ export default function Kitchen() {
     }
     
     // Not authenticated - redirect to login
-    navigate(`/r/${slug}/kitchen/login`);
+    navigate(`/${slug}/kitchen/login`);
   };
 
   const handleLogout = () => {
     if (store?.id) {
       localStorage.removeItem(`kitchen_auth_${store.id}`);
     }
-    navigate(`/r/${slug}/kitchen/login`);
+    navigate(`/${slug}/kitchen/login`);
   };
 
   // Create audio context for notification sound
@@ -208,7 +208,7 @@ export default function Kitchen() {
               </Button>
               <Button 
                 variant="outline" 
-                onClick={() => navigate(`/r/${slug}/admin`)}
+                onClick={() => navigate(`/${slug}/admin`)}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Admin

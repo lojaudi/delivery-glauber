@@ -32,7 +32,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: React.R
 
 export default function MyOrders() {
   const { slug } = useParams<{ slug: string }>();
-  const basePath = slug ? `/r/${slug}` : '/';
+  const basePath = slug ? `/${slug}` : '/';
   const { data: store } = useStoreConfig();
   const { data: restaurant } = useRestaurantBySlug(slug);
   const [phone, setPhone] = useState('');

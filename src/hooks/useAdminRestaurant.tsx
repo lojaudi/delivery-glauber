@@ -5,7 +5,7 @@ import { useAuth } from './useAuth';
 
 /**
  * Hook centralizado para obter o restaurantId do admin logado.
- * Funciona tanto com rotas /r/:slug/admin/* quanto /admin/*
+ * Funciona tanto com rotas /:slug/admin/* quanto /admin/*
  * 
  * Para rotas com slug: usa o slug para buscar o restaurante
  * Para rotas sem slug: usa o user_id para buscar o restaurante do admin

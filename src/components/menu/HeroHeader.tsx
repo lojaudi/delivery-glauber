@@ -14,7 +14,7 @@ const DEFAULT_COVER = 'https://images.unsplash.com/photo-1568901346375-23c9450c5
 export function HeroHeader({ store }: HeroHeaderProps) {
   const { totalItems } = useCart();
   const { slug } = useParams<{ slug: string }>();
-  const basePath = slug ? `/r/${slug}` : '';
+  const basePath = slug ? `/${slug}` : '';
   const coverUrl = store.cover_url || DEFAULT_COVER;
   const { isOpen } = useStoreOpenStatus(store.restaurant_id);
 
