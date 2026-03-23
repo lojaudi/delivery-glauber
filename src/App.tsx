@@ -76,39 +76,39 @@ const App = () => (
                 <Route path="/" element={<InitialRedirect />} />
                 <Route path="/auth" element={<Auth />} />
                 
-                {/* Restaurant Routes (Multi-tenant) */}
-                <Route path="/r/:slug" element={<Index />} />
-                <Route path="/r/:slug/cart" element={<Cart />} />
-                <Route path="/r/:slug/checkout" element={<Checkout />} />
-                <Route path="/r/:slug/order/:id" element={<OrderStatus />} />
-                <Route path="/r/:slug/my-orders" element={<MyOrders />} />
-                <Route path="/r/:slug/auth" element={<Auth />} />
-                <Route path="/r/:slug/suspended" element={<RestaurantSuspended />} />
+                {/* Restaurant Routes (Multi-tenant) - must come AFTER specific routes */}
+                <Route path="/:slug" element={<Index />} />
+                <Route path="/:slug/cart" element={<Cart />} />
+                <Route path="/:slug/checkout" element={<Checkout />} />
+                <Route path="/:slug/order/:id" element={<OrderStatus />} />
+                <Route path="/:slug/my-orders" element={<MyOrders />} />
+                <Route path="/:slug/auth" element={<Auth />} />
+                <Route path="/:slug/suspended" element={<RestaurantSuspended />} />
                 
                 {/* Restaurant Admin Routes (Multi-tenant) */}
-                <Route path="/r/:slug/admin" element={<AdminDashboard />} />
-                <Route path="/r/:slug/admin/orders" element={<AdminOrders />} />
-                <Route path="/r/:slug/admin/products" element={<AdminProducts />} />
-                <Route path="/r/:slug/admin/categories" element={<AdminCategories />} />
-                <Route path="/r/:slug/admin/coupons" element={<AdminCoupons />} />
-                <Route path="/r/:slug/admin/hours" element={<AdminHours />} />
-                <Route path="/r/:slug/admin/delivery-zones" element={<AdminDeliveryZones />} />
-                <Route path="/r/:slug/admin/settings" element={<AdminSettings />} />
-                <Route path="/r/:slug/admin/setup" element={<AdminSetup />} />
-                <Route path="/r/:slug/admin/addons" element={<AdminAddons />} />
-                <Route path="/r/:slug/admin/pdv" element={<AdminPDV />} />
-                <Route path="/r/:slug/admin/waiters" element={<AdminWaiters />} />
-                <Route path="/r/:slug/admin/reports" element={<AdminReports />} />
-                <Route path="/r/:slug/admin/customers" element={<AdminCustomers />} />
-                <Route path="/r/:slug/admin/drivers" element={<AdminDrivers />} />
+                <Route path="/:slug/admin" element={<AdminDashboard />} />
+                <Route path="/:slug/admin/orders" element={<AdminOrders />} />
+                <Route path="/:slug/admin/products" element={<AdminProducts />} />
+                <Route path="/:slug/admin/categories" element={<AdminCategories />} />
+                <Route path="/:slug/admin/coupons" element={<AdminCoupons />} />
+                <Route path="/:slug/admin/hours" element={<AdminHours />} />
+                <Route path="/:slug/admin/delivery-zones" element={<AdminDeliveryZones />} />
+                <Route path="/:slug/admin/settings" element={<AdminSettings />} />
+                <Route path="/:slug/admin/setup" element={<AdminSetup />} />
+                <Route path="/:slug/admin/addons" element={<AdminAddons />} />
+                <Route path="/:slug/admin/pdv" element={<AdminPDV />} />
+                <Route path="/:slug/admin/waiters" element={<AdminWaiters />} />
+                <Route path="/:slug/admin/reports" element={<AdminReports />} />
+                <Route path="/:slug/admin/customers" element={<AdminCustomers />} />
+                <Route path="/:slug/admin/drivers" element={<AdminDrivers />} />
                 
                 {/* Restaurant Waiter, Kitchen & Driver Routes (Multi-tenant) */}
-                <Route path="/r/:slug/waiter" element={<WaiterAccess />} />
-                <Route path="/r/:slug/waiter/dashboard" element={<WaiterDashboard />} />
-                <Route path="/r/:slug/kitchen" element={<Kitchen />} />
-                <Route path="/r/:slug/kitchen/login" element={<KitchenLogin />} />
-                <Route path="/r/:slug/driver" element={<DriverAccess />} />
-                <Route path="/r/:slug/driver/dashboard" element={<DriverDashboard />} />
+                <Route path="/:slug/waiter" element={<WaiterAccess />} />
+                <Route path="/:slug/waiter/dashboard" element={<WaiterDashboard />} />
+                <Route path="/:slug/kitchen" element={<Kitchen />} />
+                <Route path="/:slug/kitchen/login" element={<KitchenLogin />} />
+                <Route path="/:slug/driver" element={<DriverAccess />} />
+                <Route path="/:slug/driver/dashboard" element={<DriverDashboard />} />
                 
                 {/* Legacy Admin Routes - Redirect to auth for restaurant admins */}
                 <Route path="/admin/*" element={<Auth />} />
