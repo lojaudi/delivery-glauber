@@ -76,7 +76,24 @@ const App = () => (
                 <Route path="/" element={<InitialRedirect />} />
                 <Route path="/auth" element={<Auth />} />
                 
-                {/* Restaurant Routes (Multi-tenant) - must come AFTER specific routes */}
+                {/* Legacy Admin Routes */}
+                <Route path="/admin/*" element={<Auth />} />
+                
+                {/* Landing Page Route */}
+                <Route path="/lp/:resellerSlug" element={<Landing />} />
+                
+                {/* Reseller Routes - must come BEFORE /:slug */}
+                <Route path="/setup" element={<ResellerSetup />} />
+                <Route path="/reseller" element={<ResellerDashboard />} />
+                <Route path="/reseller/restaurants" element={<ResellerRestaurants />} />
+                <Route path="/reseller/restaurants/:id" element={<ResellerRestaurantDetails />} />
+                <Route path="/reseller/subscriptions" element={<ResellerSubscriptions />} />
+                <Route path="/reseller/reports" element={<ResellerReports />} />
+                <Route path="/reseller/settings" element={<ResellerSettings />} />
+                <Route path="/reseller/guia-mercadopago" element={<ResellerMercadoPagoGuide />} />
+                <Route path="/docs" element={<ResellerDocs />} />
+                
+                {/* Restaurant Routes (Multi-tenant) - /:slug must come AFTER specific routes */}
                 <Route path="/:slug" element={<Index />} />
                 <Route path="/:slug/cart" element={<Cart />} />
                 <Route path="/:slug/checkout" element={<Checkout />} />
@@ -109,23 +126,6 @@ const App = () => (
                 <Route path="/:slug/kitchen/login" element={<KitchenLogin />} />
                 <Route path="/:slug/driver" element={<DriverAccess />} />
                 <Route path="/:slug/driver/dashboard" element={<DriverDashboard />} />
-                
-                {/* Legacy Admin Routes - Redirect to auth for restaurant admins */}
-                <Route path="/admin/*" element={<Auth />} />
-                
-                {/* Landing Page Route */}
-                <Route path="/lp/:resellerSlug" element={<Landing />} />
-                
-                {/* Reseller Routes */}
-                <Route path="/setup" element={<ResellerSetup />} />
-                <Route path="/reseller" element={<ResellerDashboard />} />
-                <Route path="/reseller/restaurants" element={<ResellerRestaurants />} />
-                <Route path="/reseller/restaurants/:id" element={<ResellerRestaurantDetails />} />
-                <Route path="/reseller/subscriptions" element={<ResellerSubscriptions />} />
-                <Route path="/reseller/reports" element={<ResellerReports />} />
-                <Route path="/reseller/settings" element={<ResellerSettings />} />
-                <Route path="/reseller/guia-mercadopago" element={<ResellerMercadoPagoGuide />} />
-                <Route path="/docs" element={<ResellerDocs />} />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
