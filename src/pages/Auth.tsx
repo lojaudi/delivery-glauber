@@ -39,8 +39,8 @@ const Auth = () => {
   });
 
   // Determine base paths based on slug
-  const menuPath = slug ? `/r/${slug}` : '/';
-  const adminPath = slug ? `/r/${slug}/admin` : null;
+  const menuPath = slug ? `/${slug}` : '/';
+  const adminPath = slug ? `/${slug}/admin` : null;
 
   // Function to check roles and redirect accordingly
   const checkRolesAndRedirect = async (userId: string) => {
@@ -81,11 +81,11 @@ const Auth = () => {
         // If we're on a specific restaurant's auth page, redirect to that restaurant's admin
         if (slug) {
           setIsLoading(false);
-          navigate(`/r/${slug}/admin`);
+          navigate(`/${slug}/admin`);
         } else if (restaurantSlug) {
           // Otherwise redirect to their restaurant's admin
           setIsLoading(false);
-          navigate(`/r/${restaurantSlug}/admin`);
+          navigate(`/${restaurantSlug}/admin`);
         } else {
           setIsLoading(false);
           toast({
@@ -109,7 +109,7 @@ const Auth = () => {
       console.error('Error checking roles:', error);
       setIsLoading(false);
       if (slug) {
-        navigate(`/r/${slug}/admin`);
+        navigate(`/${slug}/admin`);
       }
     }
   };

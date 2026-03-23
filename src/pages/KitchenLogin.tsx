@@ -30,7 +30,7 @@ export default function KitchenLogin() {
     if (savedAuth) {
       const authData = JSON.parse(savedAuth);
       if (Date.now() - authData.timestamp < 24 * 60 * 60 * 1000) {
-        navigate(`/r/${slug}/kitchen`);
+        navigate(`/${slug}/kitchen`);
         return;
       }
     }
@@ -47,7 +47,7 @@ export default function KitchenLogin() {
 
       if (result.success && !result.pinRequired) {
         // No PIN required, go directly to kitchen
-        navigate(`/r/${slug}/kitchen`);
+        navigate(`/${slug}/kitchen`);
       } else {
         setPinRequired(true);
       }
@@ -77,7 +77,7 @@ export default function KitchenLogin() {
           timestamp: Date.now(),
           authenticated: true
         }));
-        navigate(`/r/${slug}/kitchen`);
+        navigate(`/${slug}/kitchen`);
       } else {
         setError(result.error || 'PIN incorreto. Tente novamente.');
       }

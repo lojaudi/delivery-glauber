@@ -14,7 +14,7 @@ const Cart = () => {
 
   // Use URL slug first, then fall back to persisted slug
   const effectiveSlug = slug || restaurantSlug;
-  const basePath = effectiveSlug ? `/r/${effectiveSlug}` : '/';
+  const basePath = effectiveSlug ? `/${effectiveSlug}` : '/';
 
   // Persist slug when available from URL
   useEffect(() => {

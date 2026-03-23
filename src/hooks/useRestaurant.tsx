@@ -96,7 +96,7 @@ export function RestaurantProvider({ children }: { children: ReactNode }) {
   // Apenas para páginas do cliente (não admin)
   useEffect(() => {
     if (isBlocked && slug && !location.pathname.includes('/admin') && !location.pathname.includes('/suspended')) {
-      navigate(`/r/${slug}/suspended`, { replace: true });
+      navigate(`/${slug}/suspended`, { replace: true });
     }
   }, [isBlocked, slug, location.pathname, navigate]);
 

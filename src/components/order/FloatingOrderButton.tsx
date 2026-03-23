@@ -27,7 +27,7 @@ interface FloatingOrderButtonProps {
 export function FloatingOrderButton({ orderId, onDismiss }: FloatingOrderButtonProps) {
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
-  const basePath = slug ? `/r/${slug}` : '';
+  const basePath = slug ? `/${slug}` : '';
   const [isVisible, setIsVisible] = useState(true);
 
   // Subscribe to order status changes and hide when completed

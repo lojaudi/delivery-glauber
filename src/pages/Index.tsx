@@ -40,7 +40,7 @@ const Index = () => {
   const [lastOrderId, setLastOrderId] = useState<number | null>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   
-  const basePath = slug ? `/r/${slug}` : '';
+  const basePath = slug ? `/${slug}` : '';
 
   // Check if any reseller exists (system is configured)
   const { data: hasReseller, isLoading: resellerCheckLoading } = useQuery({

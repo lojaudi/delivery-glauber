@@ -105,11 +105,11 @@ function RestaurantDetailsContent() {
           </div>
           <p className="text-muted-foreground">/{restaurant.slug}</p>
         </div>
-        <Button variant="outline" onClick={() => window.open(`/r/${restaurant.slug}`, '_blank')}>
+        <Button variant="outline" onClick={() => window.open(`/${restaurant.slug}`, '_blank')}>
           <ExternalLink className="h-4 w-4 mr-2" />
           Ver Cardápio
         </Button>
-        <Button onClick={() => window.open(`/r/${restaurant.slug}/admin`, '_blank')}>
+        <Button onClick={() => window.open(`/${restaurant.slug}/admin`, '_blank')}>
           <Settings className="h-4 w-4 mr-2" />
           Acessar Painel
         </Button>
