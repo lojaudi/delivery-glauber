@@ -316,7 +316,7 @@ Qualquer dúvida, estou à disposição! 🙂`;
           <div className="space-y-2">
             <Label htmlFor="slug">URL (slug)</Label>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">/r/</span>
+              <span className="text-sm text-muted-foreground">/</span>
               <Input
                 id="slug"
                 value={slug}

@@ -155,7 +155,7 @@ const Auth = () => {
       }
 
       const redirectUrl = slug 
-        ? `${window.location.origin}/r/${slug}/auth`
+        ? `${window.location.origin}/${slug}/auth`
         : `${window.location.origin}/auth`;
 
       const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
