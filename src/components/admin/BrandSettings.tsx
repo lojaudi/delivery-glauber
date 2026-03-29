@@ -137,19 +137,53 @@ export function BrandSettings({ className }: BrandSettingsProps) {
 
         {/* Custom Domain */}
         <div className="border-t pt-6 space-y-4">
-          <h4 className="font-medium text-sm">Domínio Personalizado</h4>
+          <h4 className="font-medium text-sm">🌐 Domínio Personalizado</h4>
           <div className="space-y-2">
             <Label className="text-xs sm:text-sm text-muted-foreground">
-              URL do seu estabelecimento (com https://)
+              Domínio do seu estabelecimento
             </Label>
             <Input
               value={formData.custom_domain}
               onChange={(e) => setFormData({ ...formData, custom_domain: e.target.value })}
-              placeholder="https://meurestaurante.com.br"
+              placeholder="meurestaurante.com.br"
             />
             <p className="text-xs text-muted-foreground">
-              Este domínio será usado nos links enviados via WhatsApp para entregadores e clientes.
+              Digite apenas o domínio (sem https://). Ex: <strong>meurestaurante.com.br</strong>
             </p>
+          </div>
+
+          <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+            <h5 className="font-medium text-sm text-foreground">📋 Como configurar seu domínio próprio</h5>
+            <div className="text-xs text-muted-foreground space-y-2">
+              <p><strong>1.</strong> Compre um domínio em um registrador (ex: Registro.br, GoDaddy, Hostinger).</p>
+              <p><strong>2.</strong> Acesse o <strong>painel de DNS</strong> do seu domínio e crie os seguintes registros:</p>
+              <div className="bg-background rounded border p-3 font-mono text-[11px] space-y-1">
+                <p><span className="text-primary font-semibold">Tipo A</span> — Nome: <strong>@</strong> — Valor: <strong>IP do servidor da plataforma</strong></p>
+                <p><span className="text-primary font-semibold">Tipo A</span> — Nome: <strong>www</strong> — Valor: <strong>IP do servidor da plataforma</strong></p>
+                <p className="text-muted-foreground mt-1">ou</p>
+                <p><span className="text-primary font-semibold">Tipo CNAME</span> — Nome: <strong>www</strong> — Valor: <strong>meufood.online</strong></p>
+              </div>
+              <p><strong>3.</strong> No servidor da plataforma (Hostinger), o administrador deve adicionar seu domínio como <strong>Server Alias</strong> no Apache/Nginx.</p>
+              <p><strong>4.</strong> Aguarde a propagação do DNS (pode levar até 24h).</p>
+              <p><strong>5.</strong> Após a propagação, seu cardápio estará acessível em <strong>{formData.custom_domain || 'seudominio.com.br'}</strong> automaticamente!</p>
+              
+              <div className="border-t pt-2 mt-2">
+                <p className="font-medium text-foreground">⚙️ Para o administrador do servidor:</p>
+                <p>No Apache, adicione no VirtualHost:</p>
+                <div className="bg-background rounded border p-2 font-mono text-[10px] mt-1">
+                  <p>ServerAlias {formData.custom_domain || 'meurestaurante.com.br'}</p>
+                  <p>ServerAlias www.{formData.custom_domain || 'meurestaurante.com.br'}</p>
+                </div>
+                <p className="mt-2">No Nginx, adicione no bloco server:</p>
+                <div className="bg-background rounded border p-2 font-mono text-[10px] mt-1">
+                  <p>server_name {formData.custom_domain || 'meurestaurante.com.br'} www.{formData.custom_domain || 'meurestaurante.com.br'};</p>
+                </div>
+                <p className="mt-2">Após adicionar, reinicie o servidor e configure o SSL com Certbot:</p>
+                <div className="bg-background rounded border p-2 font-mono text-[10px] mt-1">
+                  <p>sudo certbot --apache -d {formData.custom_domain || 'meurestaurante.com.br'} -d www.{formData.custom_domain || 'meurestaurante.com.br'}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

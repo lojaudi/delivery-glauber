@@ -1,7 +1,7 @@
-import Landing from './Landing';
+import CustomDomainRedirect from './CustomDomainRedirect';
 
 const InitialRedirect = () => {
-  return <Landing />;
+  return <CustomDomainRedirect />;
 };
 
 export default InitialRedirect;
