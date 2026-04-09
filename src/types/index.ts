@@ -24,11 +24,18 @@ export interface HalfHalfInfo {
   };
 }
 
+export interface AddonDetail {
+  groupName: string;
+  optionName: string;
+  price: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
   observation?: string;
   selectedAddons?: Record<string, string[]>; // groupId -> optionIds
+  selectedAddonDetails?: AddonDetail[];
   halfHalf?: HalfHalfInfo;
 }
 

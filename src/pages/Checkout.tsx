@@ -261,12 +261,32 @@ const Checkout = () => {
           payment_method: paymentMethod,
           change_for: selectedPayment === 'money' && changeFor ? parseFloat(changeFor.replace(',', '.')) : null,
         },
-        items: items.map(item => ({
-          product_name: item.product.name,
-          quantity: item.quantity,
-          unit_price: item.product.price,
-          observation: item.observation || null,
-        })),
+        items: items.map(item => {
+          // Build observation with addon details
+          const parts: string[] = [];
+          if (item.selectedAddonDetails && item.selectedAddonDetails.length > 0) {
+            const addonText = item.selectedAddonDetails.map(a => 
+              a.price > 0 ? `${a.optionName} (+${a.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})` : a.optionName
+            ).join(', ');
+            parts.push(`Adicionais: ${addonText}`);
+          }
+          if (item.observation) {
+            parts.push(item.observation);
+          }
+          
+          // Build product name with half-half info
+          let productName = item.product.name;
+          if (item.halfHalf) {
+            productName = `½ ${item.product.name} + ½ ${item.halfHalf.secondProduct.name}`;
+          }
+          
+          return {
+            product_name: productName,
+            quantity: item.quantity,
+            unit_price: item.product.price,
+            observation: parts.length > 0 ? parts.join(' | ') : null,
+          };
+        }),
       });
 
       toast({

@@ -118,6 +118,24 @@ export function ProductModal({
       removeItem(product.id);
     }
 
+    // Build addon details with names for display and persistence
+    const addonDetails: Array<{groupName: string; optionName: string; price: number}> = [];
+    if (addonGroups) {
+      addonGroups.forEach((group: AddonGroupWithOptions) => {
+        const selected = selectedAddOns[group.id] || [];
+        selected.forEach(optionId => {
+          const option = group.options.find(o => o.id === optionId);
+          if (option) {
+            addonDetails.push({
+              groupName: group.title || group.name,
+              optionName: option.name,
+              price: Number(option.price),
+            });
+          }
+        });
+      });
+    }
+
     addItem(
       {
         id: product.id,
@@ -130,7 +148,9 @@ export function ProductModal({
       },
       quantity,
       observation.trim() ? observation.trim() : undefined,
-      selectedAddOns
+      selectedAddOns,
+      undefined, // halfHalf
+      addonDetails.length > 0 ? addonDetails : undefined,
     );
 
     if (isEditing && returnTo) {
