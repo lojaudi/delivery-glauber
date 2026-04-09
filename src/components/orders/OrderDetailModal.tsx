@@ -137,21 +137,33 @@ export function OrderDetailModal({ order, open, onOpenChange }: OrderDetailModal
           <div className="space-y-3">
             <h3 className="font-semibold text-sm text-muted-foreground">ITENS DO PEDIDO</h3>
             <div className="space-y-2">
-              {items?.map((item) => (
+              {items?.map((item) => {
+                // Parse observation to separate addons from user notes
+                const observationParts = item.observation?.split(' | ') || [];
+                const addonsPart = observationParts.find(p => p.startsWith('Adicionais:'));
+                const userNotes = observationParts.filter(p => !p.startsWith('Adicionais:')).join(' | ');
+                
+                return (
                 <div key={item.id} className="flex justify-between items-start">
                   <div className="flex-1">
                     <p className="font-medium">
                       {item.quantity}x {item.product_name}
                     </p>
-                    {item.observation && (
-                      <p className="text-xs text-warning">📝 {item.observation}</p>
+                    {addonsPart && (
+                      <p className="text-xs text-primary/80 mt-0.5">
+                        {addonsPart}
+                      </p>
+                    )}
+                    {userNotes && (
+                      <p className="text-xs text-warning">📝 {userNotes}</p>
                     )}
                   </div>
                   <span className="font-medium">
                     {formatCurrency(item.quantity * Number(item.unit_price))}
                   </span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
