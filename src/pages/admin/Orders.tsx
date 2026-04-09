@@ -1,9 +1,19 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Loader2, Calendar, TrendingUp, Package, DollarSign, CheckCircle2, GripVertical, Wifi } from 'lucide-react';
+import { Loader2, Calendar, TrendingUp, Package, DollarSign, CheckCircle2, GripVertical, Wifi, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useStoreConfig } from '@/hooks/useStore';
 import { useOrders, useOrderItems, useUpdateOrderStatus, Order } from '@/hooks/useOrders';
@@ -25,13 +35,14 @@ import {
 } from '@dnd-kit/core';
 
 type DateFilter = 'today' | 'week' | 'month' | 'all';
-type OrderStatus = 'pending' | 'preparing' | 'delivery' | 'completed';
+type OrderStatus = 'pending' | 'preparing' | 'delivery' | 'completed' | 'cancelled';
 
 const columns: { id: OrderStatus; label: string; color: string }[] = [
   { id: 'pending', label: 'Pendentes', color: 'bg-warning/10' },
   { id: 'preparing', label: 'Em Preparo', color: 'bg-primary/10' },
   { id: 'delivery', label: 'Saiu p/ Entrega', color: 'bg-secondary/10' },
   { id: 'completed', label: 'Finalizados', color: 'bg-green-500/10' },
+  { id: 'cancelled', label: 'Cancelados', color: 'bg-destructive/10' },
 ];
 
 const COLORS = ['hsl(var(--warning))', 'hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(142, 76%, 36%)'];
@@ -81,6 +92,7 @@ function DroppableColumn({ id, children, color, label, count }: { id: string; ch
 function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { order: Order; store: any; onOpenDetails: (order: Order) => void; dragListeners?: any }) {
   const { data: items } = useOrderItems(order.id);
   const updateStatus = useUpdateOrderStatus();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const formatCurrency = (value: number) =>
     Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -219,7 +231,18 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
     }
   };
 
+  const handleCancelOrder = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCancelDialogOpen(true);
+  };
+
+  const confirmCancelOrder = () => {
+    updateStatus.mutate({ orderId: order.id, status: 'cancelled' });
+    setCancelDialogOpen(false);
+  };
+
   const isCompleted = order.status === 'completed';
+  const isCancelled = order.status === 'cancelled';
 
   return (
     <div className="rounded-xl bg-card p-3 sm:p-4 shadow-card animate-slide-up min-w-0 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all" onClick={() => onOpenDetails(order)}>
@@ -269,7 +292,7 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
           </span>
         </div>
 
-        {!isCompleted && (
+        {!isCompleted && !isCancelled && (
           <div className="flex flex-col gap-2">
             {/* WhatsApp Buttons by Status */}
             <div className="flex gap-1">
@@ -305,21 +328,35 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
               )}
             </div>
             
-            {/* Status Action Button */}
-            {getNextStatus(order.status) && (
+            {/* Action Buttons Row */}
+            <div className="flex gap-2">
+              {/* Cancel Button */}
               <Button
+                variant="destructive"
                 size="sm"
-                className="w-full"
-                onClick={handleStatusUpdate}
-                disabled={updateStatus.isPending}
+                className="text-xs"
+                onClick={handleCancelOrder}
               >
-                {updateStatus.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  getNextStatusLabel(order.status)
-                )}
+                <XCircle className="h-3.5 w-3.5 mr-1" />
+                Rejeitar
               </Button>
-            )}
+
+              {/* Status Action Button */}
+              {getNextStatus(order.status) && (
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleStatusUpdate}
+                  disabled={updateStatus.isPending}
+                >
+                  {updateStatus.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    getNextStatusLabel(order.status)
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         )}
 
@@ -339,7 +376,33 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
             </div>
           </div>
         )}
+
+        {isCancelled && (
+          <div className="flex items-center justify-center gap-1.5 text-destructive">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">Cancelado</span>
+          </div>
+        )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rejeitar pedido #{order.id}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação irá cancelar o pedido de <strong>{order.customer_name}</strong> no valor de{' '}
+              <strong>{formatCurrency(order.total_amount)}</strong>. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Voltar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancelOrder} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Confirmar Rejeição
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -732,7 +795,7 @@ const AdminOrders = () => {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-6">
             {columns.map((column) => {
               const columnOrders = filteredOrders.filter(o => o.status === column.id);
               

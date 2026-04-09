@@ -21,6 +21,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   preparing: { label: 'Em Preparo', color: 'bg-blue-100 text-blue-800' },
   delivery: { label: 'Saiu p/ Entrega', color: 'bg-purple-100 text-purple-800' },
   completed: { label: 'Finalizado', color: 'bg-green-100 text-green-800' },
+  cancelled: { label: 'Cancelado', color: 'bg-red-100 text-red-800' },
 };
 
 const paymentConfig: Record<string, { label: string; icon: string }> = {
