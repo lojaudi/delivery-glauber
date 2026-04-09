@@ -62,6 +62,25 @@ export interface PrintOrderData {
   qrCodeData?: string; // Data for QR code (e.g., order tracking URL)
 }
 
+// Parse observation field to separate addons from user notes
+// Format: "Adicionais: Bacon (+R$ 3,00), Queijo (+R$ 2,00) | User note here"
+function parseObservation(observation: string): { addons: string[]; notes: string } {
+  const parts = observation.split(' | ');
+  const addonsPart = parts.find(p => p.startsWith('Adicionais:'));
+  const notesParts = parts.filter(p => !p.startsWith('Adicionais:'));
+  
+  const addons: string[] = [];
+  if (addonsPart) {
+    // Extract individual addon items after "Adicionais: "
+    const addonsStr = addonsPart.replace('Adicionais: ', '');
+    addonsStr.split(', ').forEach(a => {
+      if (a.trim()) addons.push(a.trim());
+    });
+  }
+  
+  return { addons, notes: notesParts.join(' | ').trim() };
+}
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
@@ -305,8 +324,17 @@ export function generateReceiptBytes(data: PrintOrderData, printerWidth: 48 | 32
       bytes.push(...LEFT);
     }
     
+    // Parse observation to separate addons from user notes
     if (item.observation) {
-      addLine(bytes, `    > ${item.observation}`);
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          addLine(bytes, `    + ${addon}`);
+        });
+      }
+      if (notes) {
+        addLine(bytes, `    * Obs: ${notes}`);
+      }
     }
   });
 
