@@ -156,7 +156,7 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>Adicionar Item</DialogTitle>
         </DialogHeader>
