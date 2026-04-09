@@ -35,13 +35,14 @@ import {
 } from '@dnd-kit/core';
 
 type DateFilter = 'today' | 'week' | 'month' | 'all';
-type OrderStatus = 'pending' | 'preparing' | 'delivery' | 'completed';
+type OrderStatus = 'pending' | 'preparing' | 'delivery' | 'completed' | 'cancelled';
 
 const columns: { id: OrderStatus; label: string; color: string }[] = [
   { id: 'pending', label: 'Pendentes', color: 'bg-warning/10' },
   { id: 'preparing', label: 'Em Preparo', color: 'bg-primary/10' },
   { id: 'delivery', label: 'Saiu p/ Entrega', color: 'bg-secondary/10' },
   { id: 'completed', label: 'Finalizados', color: 'bg-green-500/10' },
+  { id: 'cancelled', label: 'Cancelados', color: 'bg-destructive/10' },
 ];
 
 const COLORS = ['hsl(var(--warning))', 'hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(142, 76%, 36%)'];
