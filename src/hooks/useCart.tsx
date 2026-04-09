@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { CartItem, Product, HalfHalfInfo } from '@/types';
+import { CartItem, Product, HalfHalfInfo, AddonDetail } from '@/types';
 
 const CART_STORAGE_KEY = 'delivery-cart';
 
@@ -10,7 +10,7 @@ interface CartStorageData {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => void;
+  addItem: (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo, selectedAddonDetails?: AddonDetail[]) => void;
   removeItem: (productId: string, halfHalfSecondId?: string) => void;
   updateQuantity: (productId: string, quantity: number, halfHalfSecondId?: string) => void;
   clearCart: () => void;
@@ -59,13 +59,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     saveCartToStorage(cartData);
   }, [cartData]);
 
-  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo) => {
+  const addItem = (product: Product, quantity: number, observation?: string, selectedAddons?: Record<string, string[]>, halfHalf?: HalfHalfInfo, selectedAddonDetails?: AddonDetail[]) => {
     setCartData(prev => {
-      // For half-half items, use a composite key
-      const itemKey = halfHalf 
-        ? `${product.id}_half_${halfHalf.secondProduct.id}` 
-        : product.id;
-      
       const existingIndex = prev.items.findIndex(item => {
         if (item.halfHalf && halfHalf) {
           return item.product.id === product.id && item.halfHalf.secondProduct.id === halfHalf.secondProduct.id;
@@ -80,12 +75,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: updatedItems[existingIndex].quantity + quantity,
           observation: observation || updatedItems[existingIndex].observation,
           selectedAddons: selectedAddons || updatedItems[existingIndex].selectedAddons,
+          selectedAddonDetails: selectedAddonDetails || updatedItems[existingIndex].selectedAddonDetails,
           halfHalf: halfHalf || updatedItems[existingIndex].halfHalf,
         };
         return { ...prev, items: updatedItems };
       }
       
-      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, halfHalf }] };
+      return { ...prev, items: [...prev.items, { product, quantity, observation, selectedAddons, selectedAddonDetails, halfHalf }] };
     });
   };
 
