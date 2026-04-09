@@ -292,7 +292,7 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
           </span>
         </div>
 
-        {!isCompleted && (
+        {!isCompleted && !isCancelled && (
           <div className="flex flex-col gap-2">
             {/* WhatsApp Buttons by Status */}
             <div className="flex gap-1">
@@ -328,21 +328,35 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
               )}
             </div>
             
-            {/* Status Action Button */}
-            {getNextStatus(order.status) && (
+            {/* Action Buttons Row */}
+            <div className="flex gap-2">
+              {/* Cancel Button */}
               <Button
+                variant="destructive"
                 size="sm"
-                className="w-full"
-                onClick={handleStatusUpdate}
-                disabled={updateStatus.isPending}
+                className="text-xs"
+                onClick={handleCancelOrder}
               >
-                {updateStatus.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  getNextStatusLabel(order.status)
-                )}
+                <XCircle className="h-3.5 w-3.5 mr-1" />
+                Rejeitar
               </Button>
-            )}
+
+              {/* Status Action Button */}
+              {getNextStatus(order.status) && (
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleStatusUpdate}
+                  disabled={updateStatus.isPending}
+                >
+                  {updateStatus.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    getNextStatusLabel(order.status)
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         )}
 
@@ -362,7 +376,33 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
             </div>
           </div>
         )}
+
+        {isCancelled && (
+          <div className="flex items-center justify-center gap-1.5 text-destructive">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">Cancelado</span>
+          </div>
+        )}
       </div>
+
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rejeitar pedido #{order.id}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação irá cancelar o pedido de <strong>{order.customer_name}</strong> no valor de{' '}
+              <strong>{formatCurrency(order.total_amount)}</strong>. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Voltar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancelOrder} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Confirmar Rejeição
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
