@@ -92,6 +92,7 @@ function DroppableColumn({ id, children, color, label, count }: { id: string; ch
 function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { order: Order; store: any; onOpenDetails: (order: Order) => void; dragListeners?: any }) {
   const { data: items } = useOrderItems(order.id);
   const updateStatus = useUpdateOrderStatus();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const formatCurrency = (value: number) =>
     Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
