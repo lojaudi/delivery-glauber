@@ -231,7 +231,18 @@ function OrderCardContent({ order, store, onOpenDetails, dragListeners }: { orde
     }
   };
 
+  const handleCancelOrder = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCancelDialogOpen(true);
+  };
+
+  const confirmCancelOrder = () => {
+    updateStatus.mutate({ orderId: order.id, status: 'cancelled' });
+    setCancelDialogOpen(false);
+  };
+
   const isCompleted = order.status === 'completed';
+  const isCancelled = order.status === 'cancelled';
 
   return (
     <div className="rounded-xl bg-card p-3 sm:p-4 shadow-card animate-slide-up min-w-0 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all" onClick={() => onOpenDetails(order)}>
