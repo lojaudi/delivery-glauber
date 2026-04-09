@@ -834,15 +834,18 @@ export function printReceiptBrowser(data: PrintOrderData): void {
           <span>QTD  ITEM</span>
           <span>VALOR</span>
         </div>
-        ${data.items.map(item => `
+        ${data.items.map(item => {
+          const parsed = parseObservation(item.observation || '');
+          return `
           <div class="item">
             <div class="item-main">
               <span><span class="item-qty">${item.quantity}x</span>${item.name}</span>
               <span class="item-price">${formatCurrency(item.quantity * item.unitPrice)}</span>
             </div>
-            ${item.observation ? `<div class="item-obs">▸ ${item.observation}</div>` : ''}
+            ${parsed.addons.length > 0 ? `<div class="item-addons" style="margin-left:20px;font-size:10px;color:#333;">${parsed.addons.map(a => `<div>+ ${a}</div>`).join('')}</div>` : ''}
+            ${parsed.notes ? `<div class="item-obs">📝 ${parsed.notes}</div>` : ''}
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
 
       <!-- Totals -->
@@ -1010,7 +1013,15 @@ export function generatePrintableText(data: PrintOrderData): string {
     const qtyStr = String(item.quantity).padStart(2, ' ') + 'x ';
     text += formatLine(qtyStr + item.name, itemTotal, width) + '\n';
     if (item.observation) {
-      text += `     > ${item.observation}\n`;
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          text += `     + ${addon}\n`;
+        });
+      }
+      if (notes) {
+        text += `     * Obs: ${notes}\n`;
+      }
     }
   });
 
