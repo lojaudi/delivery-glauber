@@ -795,7 +795,7 @@ const AdminOrders = () => {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 sm:gap-6">
             {columns.map((column) => {
               const columnOrders = filteredOrders.filter(o => o.status === column.id);
               
