@@ -469,7 +469,15 @@ export function generateReceiptText(data: PrintOrderData): string {
     receipt += `${itemTotal}\n`;
     receipt += ESC_T + 'a\x00';
     if (item.observation) {
-      receipt += `  Obs: ${item.observation}\n`;
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          receipt += `  + ${addon}\n`;
+        });
+      }
+      if (notes) {
+        receipt += `  * Obs: ${notes}\n`;
+      }
     }
   });
 
