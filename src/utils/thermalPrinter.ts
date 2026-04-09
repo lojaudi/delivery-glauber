@@ -62,6 +62,25 @@ export interface PrintOrderData {
   qrCodeData?: string; // Data for QR code (e.g., order tracking URL)
 }
 
+// Parse observation field to separate addons from user notes
+// Format: "Adicionais: Bacon (+R$ 3,00), Queijo (+R$ 2,00) | User note here"
+function parseObservation(observation: string): { addons: string[]; notes: string } {
+  const parts = observation.split(' | ');
+  const addonsPart = parts.find(p => p.startsWith('Adicionais:'));
+  const notesParts = parts.filter(p => !p.startsWith('Adicionais:'));
+  
+  const addons: string[] = [];
+  if (addonsPart) {
+    // Extract individual addon items after "Adicionais: "
+    const addonsStr = addonsPart.replace('Adicionais: ', '');
+    addonsStr.split(', ').forEach(a => {
+      if (a.trim()) addons.push(a.trim());
+    });
+  }
+  
+  return { addons, notes: notesParts.join(' | ').trim() };
+}
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
@@ -305,8 +324,17 @@ export function generateReceiptBytes(data: PrintOrderData, printerWidth: 48 | 32
       bytes.push(...LEFT);
     }
     
+    // Parse observation to separate addons from user notes
     if (item.observation) {
-      addLine(bytes, `    > ${item.observation}`);
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          addLine(bytes, `    + ${addon}`);
+        });
+      }
+      if (notes) {
+        addLine(bytes, `    * Obs: ${notes}`);
+      }
     }
   });
 
@@ -441,7 +469,15 @@ export function generateReceiptText(data: PrintOrderData): string {
     receipt += `${itemTotal}\n`;
     receipt += ESC_T + 'a\x00';
     if (item.observation) {
-      receipt += `  Obs: ${item.observation}\n`;
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          receipt += `  + ${addon}\n`;
+        });
+      }
+      if (notes) {
+        receipt += `  * Obs: ${notes}\n`;
+      }
     }
   });
 
@@ -798,15 +834,18 @@ export function printReceiptBrowser(data: PrintOrderData): void {
           <span>QTD  ITEM</span>
           <span>VALOR</span>
         </div>
-        ${data.items.map(item => `
+        ${data.items.map(item => {
+          const parsed = parseObservation(item.observation || '');
+          return `
           <div class="item">
             <div class="item-main">
               <span><span class="item-qty">${item.quantity}x</span>${item.name}</span>
               <span class="item-price">${formatCurrency(item.quantity * item.unitPrice)}</span>
             </div>
-            ${item.observation ? `<div class="item-obs">▸ ${item.observation}</div>` : ''}
+            ${parsed.addons.length > 0 ? `<div class="item-addons" style="margin-left:20px;font-size:10px;color:#333;">${parsed.addons.map(a => `<div>+ ${a}</div>`).join('')}</div>` : ''}
+            ${parsed.notes ? `<div class="item-obs">📝 ${parsed.notes}</div>` : ''}
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
 
       <!-- Totals -->
@@ -974,7 +1013,15 @@ export function generatePrintableText(data: PrintOrderData): string {
     const qtyStr = String(item.quantity).padStart(2, ' ') + 'x ';
     text += formatLine(qtyStr + item.name, itemTotal, width) + '\n';
     if (item.observation) {
-      text += `     > ${item.observation}\n`;
+      const { addons, notes } = parseObservation(item.observation);
+      if (addons.length > 0) {
+        addons.forEach(addon => {
+          text += `     + ${addon}\n`;
+        });
+      }
+      if (notes) {
+        text += `     * Obs: ${notes}\n`;
+      }
     }
   });
 
