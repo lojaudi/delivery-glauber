@@ -404,7 +404,3 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     </Dialog>
   );
 }
-      </DialogContent>
-    </Dialog>
-  );
-}
