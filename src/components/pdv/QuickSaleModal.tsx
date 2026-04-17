@@ -323,80 +323,93 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                       <h3 className="font-bold text-lg">{selectedProduct.name}</h3>
                       <p className="text-primary font-bold text-xl">
                         {formatCurrency(selectedProduct.price)}
+                        {selectedProduct.isWeightBased && (
+                          <span className="text-sm font-normal text-muted-foreground"> /kg</span>
+                        )}
                       </p>
                     </div>
 
-                    {/* Addons */}
-                    {productAddons && productAddons.length > 0 && (
-                      <div className="space-y-4">
-                        {productAddons.map((group) => (
-                          <div key={group.id} className="border rounded-xl p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <div>
-                                <h4 className="font-semibold">{group.title}</h4>
-                                {group.subtitle && (
-                                  <p className="text-sm text-muted-foreground">{group.subtitle}</p>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {group.is_required && (
-                                  <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
-                                )}
-                                <Badge variant="outline" className="text-xs">
-                                  Máx: {group.max_selections}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              {group.options?.map((option) => {
-                                const isSelected = selectedAddons.some(a => a.optionId === option.id);
-                                return (
-                                  <label
-                                    key={option.id}
-                                    className={cn(
-                                      "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
-                                      isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+                    {selectedProduct.isWeightBased ? (
+                      <WeightSelector
+                        pricePerKg={selectedProduct.price}
+                        value={weightGrams}
+                        onChange={setWeightGrams}
+                      />
+                    ) : (
+                      <>
+                        {/* Addons */}
+                        {productAddons && productAddons.length > 0 && (
+                          <div className="space-y-4">
+                            {productAddons.map((group) => (
+                              <div key={group.id} className="border rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div>
+                                    <h4 className="font-semibold">{group.title}</h4>
+                                    {group.subtitle && (
+                                      <p className="text-sm text-muted-foreground">{group.subtitle}</p>
                                     )}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Checkbox
-                                        checked={isSelected}
-                                        onCheckedChange={() => handleAddonToggle(group, option)}
-                                      />
-                                      <span>{option.name}</span>
-                                    </div>
-                                    {option.price > 0 && (
-                                      <span className="text-sm font-medium text-primary">
-                                        +{formatCurrency(option.price)}
-                                      </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {group.is_required && (
+                                      <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
                                     )}
-                                  </label>
-                                );
-                              })}
-                            </div>
+                                    <Badge variant="outline" className="text-xs">
+                                      Máx: {group.max_selections}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  {group.options?.map((option) => {
+                                    const isSelected = selectedAddons.some(a => a.optionId === option.id);
+                                    return (
+                                      <label
+                                        key={option.id}
+                                        className={cn(
+                                          "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
+                                          isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+                                        )}
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <Checkbox
+                                            checked={isSelected}
+                                            onCheckedChange={() => handleAddonToggle(group, option)}
+                                          />
+                                          <span>{option.name}</span>
+                                        </div>
+                                        {option.price > 0 && (
+                                          <span className="text-sm font-medium text-primary">
+                                            +{formatCurrency(option.price)}
+                                          </span>
+                                        )}
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        )}
 
-                    {/* Quantity */}
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(quantity + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
+                        {/* Quantity */}
+                        <div className="flex items-center justify-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setQuantity(quantity + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
 
                     {/* Observation */}
                     <Textarea
@@ -424,6 +437,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                           setSelectedAddons([]);
                           setQuantity(1);
                           setObservation('');
+                          setWeightGrams(0);
                         }}
                       >
                         <ArrowLeft className="h-4 w-4 mr-1" />
@@ -431,6 +445,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                       </Button>
                       <Button
                         className="flex-1"
+                        disabled={selectedProduct.isWeightBased && weightGrams <= 0}
                         onClick={() => {
                           handleAddToCart();
                           if (isMobile) setMobileView('cart');
