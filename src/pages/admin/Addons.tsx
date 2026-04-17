@@ -182,6 +182,15 @@ function SortableGroup({
                 className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg"
               >
                 <GripVertical className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                {option.image_url ? (
+                  <img
+                    src={option.image_url}
+                    alt={option.name}
+                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-md object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-md bg-muted shrink-0 border border-dashed border-border" />
+                )}
                 <div className="flex-1 min-w-0">
                   <p className={`font-medium text-xs sm:text-sm ${!option.is_available ? 'text-muted-foreground line-through' : 'text-foreground'} truncate`}>
                     {option.name}
