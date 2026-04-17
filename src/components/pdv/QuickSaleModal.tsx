@@ -16,6 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useProductAddons, AddonGroup, AddonOption } from '@/hooks/useAddons';
+import { WeightSelector } from './WeightSelector';
 import { cn } from '@/lib/utils';
 
 interface QuickSaleItem {
@@ -55,10 +56,12 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     id: string;
     name: string;
     price: number;
+    isWeightBased: boolean;
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [observation, setObservation] = useState('');
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
+  const [weightGrams, setWeightGrams] = useState(0);
   const isMobile = useIsMobile();
 
   const { data: products, isLoading: loadingProducts } = useProducts();
@@ -86,9 +89,12 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
 
   const currentItemTotal = useMemo(() => {
     if (!selectedProduct) return 0;
+    if (selectedProduct.isWeightBased) {
+      return Math.round((weightGrams / 1000) * selectedProduct.price * 100) / 100;
+    }
     const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
     return (selectedProduct.price + addonsTotal) * quantity;
-  }, [selectedProduct, selectedAddons, quantity]);
+  }, [selectedProduct, selectedAddons, quantity, weightGrams]);
 
   const handleAddonToggle = (group: AddonGroup & { options: AddonOption[] }, option: AddonOption) => {
     setSelectedAddons(prev => {
@@ -127,15 +133,21 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
 
   const handleAddToCart = () => {
     if (!selectedProduct) return;
+    if (selectedProduct.isWeightBased && weightGrams <= 0) return;
+
+    const isWeight = selectedProduct.isWeightBased;
+    const weightLabel = weightGrams >= 1000
+      ? `${(weightGrams / 1000).toFixed(weightGrams % 1000 === 0 ? 0 : 2).replace('.', ',')}kg`
+      : `${weightGrams}g`;
 
     const newItem: QuickSaleItem = {
       id: `${Date.now()}-${Math.random()}`,
       productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      quantity,
-      unitPrice: selectedProduct.price,
-      observation,
-      addons: selectedAddons,
+      productName: isWeight ? `${selectedProduct.name} (${weightLabel})` : selectedProduct.name,
+      quantity: isWeight ? 1 : quantity,
+      unitPrice: isWeight ? currentItemTotal : selectedProduct.price,
+      observation: isWeight ? [`Peso: ${weightLabel}`, observation].filter(Boolean).join(' - ') : observation,
+      addons: isWeight ? [] : selectedAddons,
       totalPrice: currentItemTotal,
     };
 
@@ -146,6 +158,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     setQuantity(1);
     setObservation('');
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -157,8 +170,10 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
       id: product.id,
       name: product.name,
       price: Number(product.price),
+      isWeightBased: !!product.is_weight_based,
     });
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleCheckout = () => {
