@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import { useToast } from '@/hooks/use-toast';
 import {
   useAddonGroups,

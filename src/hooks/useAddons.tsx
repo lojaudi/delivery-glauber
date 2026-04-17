@@ -21,6 +21,7 @@ export interface AddonOption {
   price: number;
   is_available: boolean;
   sort_order: number;
+  image_url?: string | null;
 }
 
 export interface ProductAddonGroup {
