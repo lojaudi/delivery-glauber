@@ -36,6 +36,7 @@ interface SelectedAddon {
   optionId: string;
   optionName: string;
   price: number;
+  image_url?: string | null;
 }
 
 interface QuickSaleModalProps {
@@ -112,6 +113,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
           optionId: option.id,
           optionName: option.name,
           price: option.price,
+          image_url: option.image_url || null,
         }];
       }
       
@@ -127,6 +129,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
         optionId: option.id,
         optionName: option.name,
         price: option.price,
+        image_url: option.image_url || null,
       }];
     });
   };
@@ -374,6 +377,13 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                                             checked={isSelected}
                                             onCheckedChange={() => handleAddonToggle(group, option)}
                                           />
+                                          {option.image_url && (
+                                            <img
+                                              src={option.image_url}
+                                              alt={option.name}
+                                              className="h-10 w-10 rounded-md object-cover border border-border"
+                                            />
+                                          )}
                                           <span>{option.name}</span>
                                         </div>
                                         {option.price > 0 && (
