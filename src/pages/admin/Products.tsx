@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star, Copy, Pizza } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Search, ToggleLeft, ToggleRight, Star, Copy, Pizza, Scale, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,6 +54,8 @@ const AdminProducts = () => {
     is_available: true,
     is_featured: false,
     allows_half: false,
+    is_weight_based: false,
+    hide_from_catalog: false,
   });
   const [selectedAddonGroups, setSelectedAddonGroups] = useState<string[]>([]);
   const [initialAddonGroups, setInitialAddonGroups] = useState<string[]>([]);
@@ -85,6 +87,8 @@ const AdminProducts = () => {
       is_available: true,
       is_featured: false,
       allows_half: false,
+      is_weight_based: false,
+      hide_from_catalog: false,
     });
     setSelectedAddonGroups([]);
     setIsModalOpen(true);
@@ -101,6 +105,8 @@ const AdminProducts = () => {
       is_available: product.is_available,
       is_featured: product.is_featured || false,
       allows_half: product.allows_half || false,
+      is_weight_based: product.is_weight_based || false,
+      hide_from_catalog: product.hide_from_catalog || false,
     });
     setIsModalOpen(true);
     
@@ -157,6 +163,8 @@ const AdminProducts = () => {
         is_available: formData.is_available,
         is_featured: formData.is_featured,
         allows_half: formData.allows_half,
+        is_weight_based: formData.is_weight_based,
+        hide_from_catalog: formData.hide_from_catalog,
       };
 
       let productId: string;
