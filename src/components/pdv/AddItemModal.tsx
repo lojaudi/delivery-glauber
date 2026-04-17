@@ -16,6 +16,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useTableOrderMutations } from '@/hooks/useTableOrders';
 import { useProductAddons, AddonGroup, AddonOption } from '@/hooks/useAddons';
+import { WeightSelector } from './WeightSelector';
 import { cn } from '@/lib/utils';
 
 interface AddItemModalProps {
@@ -39,10 +40,12 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     id: string;
     name: string;
     price: number;
+    isWeightBased: boolean;
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [observation, setObservation] = useState('');
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
+  const [weightGrams, setWeightGrams] = useState(0);
 
   const { data: products, isLoading: loadingProducts } = useProducts();
   const { data: categories } = useCategories();
@@ -70,8 +73,11 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
 
   const currentItemTotal = useMemo(() => {
     if (!selectedProduct) return 0;
+    if (selectedProduct.isWeightBased) {
+      return Math.round((weightGrams / 1000) * selectedProduct.price * 100) / 100;
+    }
     return (selectedProduct.price + addonsTotal) * quantity;
-  }, [selectedProduct, addonsTotal, quantity]);
+  }, [selectedProduct, addonsTotal, quantity, weightGrams]);
 
   const handleAddonToggle = (group: AddonGroup & { options: AddonOption[] }, option: AddonOption) => {
     setSelectedAddons(prev => {
@@ -112,26 +118,43 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     if (!selectedProduct) return;
 
     try {
-      // Build observation with addons
-      const addonsText = selectedAddons.length > 0
-        ? selectedAddons.map(a => a.optionName).join(', ')
-        : '';
-      const fullObservation = [addonsText, observation].filter(Boolean).join(' - ');
+      if (selectedProduct.isWeightBased) {
+        if (weightGrams <= 0) return;
+        const weightLabel = weightGrams >= 1000
+          ? `${(weightGrams / 1000).toFixed(weightGrams % 1000 === 0 ? 0 : 2).replace('.', ',')}kg`
+          : `${weightGrams}g`;
+        const weightObservation = [`Peso: ${weightLabel}`, observation].filter(Boolean).join(' - ');
+        await addItem.mutateAsync({
+          orderId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name,
+          quantity: 1,
+          unitPrice: currentItemTotal,
+          observation: weightObservation,
+        });
+      } else {
+        // Build observation with addons
+        const addonsText = selectedAddons.length > 0
+          ? selectedAddons.map(a => a.optionName).join(', ')
+          : '';
+        const fullObservation = [addonsText, observation].filter(Boolean).join(' - ');
 
-      await addItem.mutateAsync({
-        orderId,
-        productId: selectedProduct.id,
-        productName: selectedProduct.name,
-        quantity,
-        unitPrice: selectedProduct.price + addonsTotal,
-        observation: fullObservation || undefined,
-      });
+        await addItem.mutateAsync({
+          orderId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name,
+          quantity,
+          unitPrice: selectedProduct.price + addonsTotal,
+          observation: fullObservation || undefined,
+        });
+      }
 
       // Reset and close
       setSelectedProduct(null);
       setQuantity(1);
       setObservation('');
       setSelectedAddons([]);
+      setWeightGrams(0);
       onOpenChange(false);
     } catch (error) {
       // Error handled by mutation
@@ -143,8 +166,10 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
       id: product.id,
       name: product.name,
       price: Number(product.price),
+      isWeightBased: !!product.is_weight_based,
     });
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleBack = () => {
@@ -152,6 +177,7 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     setSelectedAddons([]);
     setQuantity(1);
     setObservation('');
+    setWeightGrams(0);
   };
 
   return (
