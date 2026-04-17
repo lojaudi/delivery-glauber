@@ -28,6 +28,7 @@ export interface AddonDetail {
   groupName: string;
   optionName: string;
   price: number;
+  image_url?: string | null;
 }
 
 export interface CartItem {
