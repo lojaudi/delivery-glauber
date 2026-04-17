@@ -119,7 +119,7 @@ export function ProductModal({
     }
 
     // Build addon details with names for display and persistence
-    const addonDetails: Array<{groupName: string; optionName: string; price: number}> = [];
+    const addonDetails: Array<{groupName: string; optionName: string; price: number; image_url?: string | null}> = [];
     if (addonGroups) {
       addonGroups.forEach((group: AddonGroupWithOptions) => {
         const selected = selectedAddOns[group.id] || [];
@@ -130,6 +130,7 @@ export function ProductModal({
               groupName: group.title || group.name,
               optionName: option.name,
               price: Number(option.price),
+              image_url: option.image_url || null,
             });
           }
         });
