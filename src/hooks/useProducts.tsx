@@ -13,6 +13,8 @@ export interface Product {
   is_available: boolean;
   is_featured: boolean;
   allows_half: boolean;
+  is_weight_based?: boolean;
+  hide_from_catalog?: boolean;
   restaurant_id?: string | null;
 }
 

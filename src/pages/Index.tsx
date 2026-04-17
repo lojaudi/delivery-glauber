@@ -186,8 +186,8 @@ const Index = () => {
     );
   }
 
-  // Filter products by search
-  const filteredProducts = products?.filter(product => 
+  // Filter products by search (and exclude hidden-from-catalog products)
+  const filteredProducts = products?.filter(product => !product.hide_from_catalog).filter(product => 
     searchQuery === '' || 
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
@@ -202,7 +202,7 @@ const Index = () => {
   const totalItems = filteredProducts.length;
 
   // Featured products
-  const featuredProducts = products?.filter(p => p.is_featured && p.is_available) || [];
+  const featuredProducts = products?.filter(p => p.is_featured && p.is_available && !p.hide_from_catalog) || [];
 
   // Determine which modal to show
   const modalProduct = editingProduct?.product || selectedProduct;
