@@ -135,14 +135,23 @@ const Cart = () => {
                   </div>
                   {/* Addon Details */}
                   {item.selectedAddonDetails && item.selectedAddonDetails.length > 0 && (
-                    <div className="mt-1 space-y-0.5">
+                    <div className="mt-1 space-y-1">
                       {item.selectedAddonDetails.map((addon, addonIdx) => (
-                        <p key={addonIdx} className="text-xs text-muted-foreground">
-                          + {addon.optionName}
-                          {addon.price > 0 && (
-                            <span className="ml-1 text-primary/80">({formatCurrency(addon.price)})</span>
+                        <div key={addonIdx} className="flex items-center gap-2">
+                          {addon.image_url && (
+                            <img
+                              src={addon.image_url}
+                              alt={addon.optionName}
+                              className="h-6 w-6 rounded object-cover border border-border shrink-0"
+                            />
                           )}
-                        </p>
+                          <p className="text-xs text-muted-foreground">
+                            + {addon.optionName}
+                            {addon.price > 0 && (
+                              <span className="ml-1 text-primary/80">({formatCurrency(addon.price)})</span>
+                            )}
+                          </p>
+                        </div>
                       ))}
                     </div>
                   )}
