@@ -412,11 +412,13 @@ const AdminProducts = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm text-muted-foreground">Preço *</label>
+                <label className="text-sm text-muted-foreground">
+                  {formData.is_weight_based ? 'Preço por KG *' : 'Preço *'}
+                </label>
                 <Input
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="0,00"
+                  placeholder={formData.is_weight_based ? '35,00' : '0,00'}
                   className="mt-1"
                 />
               </div>
@@ -505,6 +507,38 @@ const AdminProducts = () => {
                   <span>Permite meio a meio</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">Clientes poderão escolher 2 sabores desta categoria</p>
+              </Label>
+            </div>
+
+            {/* Weight-based Toggle */}
+            <div className="flex items-center space-x-3 bg-muted/50 rounded-lg p-3">
+              <Checkbox
+                id="is_weight_based"
+                checked={formData.is_weight_based}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_weight_based: !!checked })}
+              />
+              <Label htmlFor="is_weight_based" className="text-sm font-normal cursor-pointer flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Scale className="h-4 w-4 text-primary" />
+                  <span>Vendido por peso (KG)</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">No PDV, escolha o peso em incrementos de 50g e o valor é calculado automaticamente</p>
+              </Label>
+            </div>
+
+            {/* Hide from Catalog Toggle */}
+            <div className="flex items-center space-x-3 bg-muted/50 rounded-lg p-3">
+              <Checkbox
+                id="hide_from_catalog"
+                checked={formData.hide_from_catalog}
+                onCheckedChange={(checked) => setFormData({ ...formData, hide_from_catalog: !!checked })}
+              />
+              <Label htmlFor="hide_from_catalog" className="text-sm font-normal cursor-pointer flex-1">
+                <div className="flex items-center gap-1.5">
+                  <EyeOff className="h-4 w-4 text-primary" />
+                  <span>Ocultar no catálogo</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Produto não aparece para clientes, mas continua disponível no PDV</p>
               </Label>
             </div>
 
