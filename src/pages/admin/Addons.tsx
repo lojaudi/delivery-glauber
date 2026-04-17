@@ -632,7 +632,7 @@ const AdminAddons = () => {
       
       {/* Option Modal */}
       <Dialog open={optionModalOpen} onOpenChange={setOptionModalOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingOption ? 'Editar Opção' : 'Nova Opção'}
@@ -640,6 +640,21 @@ const AdminAddons = () => {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Imagem (opcional)</label>
+              <div className="mt-1">
+                <ImageUpload
+                  bucket="product-images"
+                  currentUrl={optionForm.image_url}
+                  onUpload={(url) => setOptionForm({ ...optionForm, image_url: url })}
+                  onRemove={() => setOptionForm({ ...optionForm, image_url: null })}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Será exibida nas comandas e na seleção do adicional
+              </p>
+            </div>
+
             <div>
               <label className="text-sm text-muted-foreground">Nome *</label>
               <Input
