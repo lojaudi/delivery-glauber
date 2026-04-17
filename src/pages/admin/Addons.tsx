@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { AdminLayout } from '@/components/admin/AdminLayout';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import { useToast } from '@/hooks/use-toast';
 import {
   useAddonGroups,
@@ -181,6 +182,15 @@ function SortableGroup({
                 className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg"
               >
                 <GripVertical className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                {option.image_url ? (
+                  <img
+                    src={option.image_url}
+                    alt={option.name}
+                    className="h-9 w-9 sm:h-10 sm:w-10 rounded-md object-cover shrink-0 border border-border"
+                  />
+                ) : (
+                  <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-md bg-muted shrink-0 border border-dashed border-border" />
+                )}
                 <div className="flex-1 min-w-0">
                   <p className={`font-medium text-xs sm:text-sm ${!option.is_available ? 'text-muted-foreground line-through' : 'text-foreground'} truncate`}>
                     {option.name}
@@ -263,6 +273,7 @@ const AdminAddons = () => {
     name: '',
     price: '',
     is_available: true,
+    image_url: null as string | null,
   });
   
   const isLoading = groupsLoading || optionsLoading;
@@ -321,6 +332,7 @@ const AdminAddons = () => {
         name: option.name,
         price: option.price.toString(),
         is_available: option.is_available,
+        image_url: option.image_url || null,
       });
     } else {
       setEditingOption(null);
@@ -328,6 +340,7 @@ const AdminAddons = () => {
         name: '',
         price: '',
         is_available: true,
+        image_url: null,
       });
     }
     setOptionModalOpen(true);
@@ -383,6 +396,7 @@ const AdminAddons = () => {
           name: optionForm.name,
           price,
           is_available: optionForm.is_available,
+          image_url: optionForm.image_url,
         });
         toast({ title: 'Opção atualizada!' });
       } else {
@@ -392,6 +406,7 @@ const AdminAddons = () => {
           name: optionForm.name,
           price,
           is_available: optionForm.is_available,
+          image_url: optionForm.image_url,
           sort_order: groupOptions.length + 1,
         });
         toast({ title: 'Opção criada!' });
@@ -617,7 +632,7 @@ const AdminAddons = () => {
       
       {/* Option Modal */}
       <Dialog open={optionModalOpen} onOpenChange={setOptionModalOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingOption ? 'Editar Opção' : 'Nova Opção'}
@@ -625,6 +640,21 @@ const AdminAddons = () => {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Imagem (opcional)</label>
+              <div className="mt-1">
+                <ImageUpload
+                  bucket="product-images"
+                  currentUrl={optionForm.image_url}
+                  onUpload={(url) => setOptionForm({ ...optionForm, image_url: url })}
+                  onRemove={() => setOptionForm({ ...optionForm, image_url: null })}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Será exibida nas comandas e na seleção do adicional
+              </p>
+            </div>
+
             <div>
               <label className="text-sm text-muted-foreground">Nome *</label>
               <Input

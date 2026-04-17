@@ -119,7 +119,7 @@ export function ProductModal({
     }
 
     // Build addon details with names for display and persistence
-    const addonDetails: Array<{groupName: string; optionName: string; price: number}> = [];
+    const addonDetails: Array<{groupName: string; optionName: string; price: number; image_url?: string | null}> = [];
     if (addonGroups) {
       addonGroups.forEach((group: AddonGroupWithOptions) => {
         const selected = selectedAddOns[group.id] || [];
@@ -130,6 +130,7 @@ export function ProductModal({
               groupName: group.title || group.name,
               optionName: option.name,
               price: Number(option.price),
+              image_url: option.image_url || null,
             });
           }
         });
@@ -235,17 +236,26 @@ export function ProductModal({
                       >
                         <Label 
                           htmlFor={`${group.id}-${option.id}`} 
-                          className="flex-1 cursor-pointer font-normal text-sm sm:text-base text-foreground"
+                          className="flex-1 cursor-pointer font-normal text-sm sm:text-base text-foreground flex items-center gap-3"
                         >
-                          {option.name}
-                          {Number(option.price) > 0 && (
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              +{Number(option.price).toLocaleString('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL'
-                              })}
-                            </span>
+                          {option.image_url && (
+                            <img
+                              src={option.image_url}
+                              alt={option.name}
+                              className="h-10 w-10 rounded-md object-cover border border-border shrink-0"
+                            />
                           )}
+                          <span className="flex-1">
+                            {option.name}
+                            {Number(option.price) > 0 && (
+                              <span className="text-muted-foreground ml-2 text-sm">
+                                +{Number(option.price).toLocaleString('pt-BR', {
+                                  style: 'currency',
+                                  currency: 'BRL'
+                                })}
+                              </span>
+                            )}
+                          </span>
                         </Label>
                         <RadioGroupItem 
                           value={option.id} 
@@ -266,17 +276,26 @@ export function ProductModal({
                         >
                           <Label 
                             htmlFor={`${group.id}-${option.id}`} 
-                            className="flex-1 cursor-pointer font-normal text-sm sm:text-base text-foreground"
+                            className="flex-1 cursor-pointer font-normal text-sm sm:text-base text-foreground flex items-center gap-3"
                           >
-                            {option.name}
-                            {Number(option.price) > 0 && (
-                              <span className="text-muted-foreground ml-2 text-sm">
-                                +{Number(option.price).toLocaleString('pt-BR', {
-                                  style: 'currency',
-                                  currency: 'BRL'
-                                })}
-                              </span>
+                            {option.image_url && (
+                              <img
+                                src={option.image_url}
+                                alt={option.name}
+                                className="h-10 w-10 rounded-md object-cover border border-border shrink-0"
+                              />
                             )}
+                            <span className="flex-1">
+                              {option.name}
+                              {Number(option.price) > 0 && (
+                                <span className="text-muted-foreground ml-2 text-sm">
+                                  +{Number(option.price).toLocaleString('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                  })}
+                                </span>
+                              )}
+                            </span>
                           </Label>
                           <Checkbox
                             id={`${group.id}-${option.id}`}
