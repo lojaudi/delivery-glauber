@@ -264,6 +264,7 @@ const AdminAddons = () => {
     name: '',
     price: '',
     is_available: true,
+    image_url: null as string | null,
   });
   
   const isLoading = groupsLoading || optionsLoading;
@@ -322,6 +323,7 @@ const AdminAddons = () => {
         name: option.name,
         price: option.price.toString(),
         is_available: option.is_available,
+        image_url: option.image_url || null,
       });
     } else {
       setEditingOption(null);
@@ -329,6 +331,7 @@ const AdminAddons = () => {
         name: '',
         price: '',
         is_available: true,
+        image_url: null,
       });
     }
     setOptionModalOpen(true);
@@ -384,6 +387,7 @@ const AdminAddons = () => {
           name: optionForm.name,
           price,
           is_available: optionForm.is_available,
+          image_url: optionForm.image_url,
         });
         toast({ title: 'Opção atualizada!' });
       } else {
@@ -393,6 +397,7 @@ const AdminAddons = () => {
           name: optionForm.name,
           price,
           is_available: optionForm.is_available,
+          image_url: optionForm.image_url,
           sort_order: groupOptions.length + 1,
         });
         toast({ title: 'Opção criada!' });
