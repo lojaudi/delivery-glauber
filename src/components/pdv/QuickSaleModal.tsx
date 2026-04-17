@@ -193,6 +193,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     setQuantity(1);
     setObservation('');
     setSelectedAddons([]);
+    setWeightGrams(0);
     onOpenChange(false);
   };
 
