@@ -16,6 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useProductAddons, AddonGroup, AddonOption } from '@/hooks/useAddons';
+import { WeightSelector } from './WeightSelector';
 import { cn } from '@/lib/utils';
 
 interface QuickSaleItem {
@@ -55,10 +56,12 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     id: string;
     name: string;
     price: number;
+    isWeightBased: boolean;
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [observation, setObservation] = useState('');
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
+  const [weightGrams, setWeightGrams] = useState(0);
   const isMobile = useIsMobile();
 
   const { data: products, isLoading: loadingProducts } = useProducts();
@@ -86,9 +89,12 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
 
   const currentItemTotal = useMemo(() => {
     if (!selectedProduct) return 0;
+    if (selectedProduct.isWeightBased) {
+      return Math.round((weightGrams / 1000) * selectedProduct.price * 100) / 100;
+    }
     const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
     return (selectedProduct.price + addonsTotal) * quantity;
-  }, [selectedProduct, selectedAddons, quantity]);
+  }, [selectedProduct, selectedAddons, quantity, weightGrams]);
 
   const handleAddonToggle = (group: AddonGroup & { options: AddonOption[] }, option: AddonOption) => {
     setSelectedAddons(prev => {
@@ -127,15 +133,21 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
 
   const handleAddToCart = () => {
     if (!selectedProduct) return;
+    if (selectedProduct.isWeightBased && weightGrams <= 0) return;
+
+    const isWeight = selectedProduct.isWeightBased;
+    const weightLabel = weightGrams >= 1000
+      ? `${(weightGrams / 1000).toFixed(weightGrams % 1000 === 0 ? 0 : 2).replace('.', ',')}kg`
+      : `${weightGrams}g`;
 
     const newItem: QuickSaleItem = {
       id: `${Date.now()}-${Math.random()}`,
       productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      quantity,
-      unitPrice: selectedProduct.price,
-      observation,
-      addons: selectedAddons,
+      productName: isWeight ? `${selectedProduct.name} (${weightLabel})` : selectedProduct.name,
+      quantity: isWeight ? 1 : quantity,
+      unitPrice: isWeight ? currentItemTotal : selectedProduct.price,
+      observation: isWeight ? [`Peso: ${weightLabel}`, observation].filter(Boolean).join(' - ') : observation,
+      addons: isWeight ? [] : selectedAddons,
       totalPrice: currentItemTotal,
     };
 
@@ -146,6 +158,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     setQuantity(1);
     setObservation('');
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleRemoveItem = (itemId: string) => {
@@ -157,8 +170,10 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
       id: product.id,
       name: product.name,
       price: Number(product.price),
+      isWeightBased: !!product.is_weight_based,
     });
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleCheckout = () => {
@@ -178,6 +193,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
     setQuantity(1);
     setObservation('');
     setSelectedAddons([]);
+    setWeightGrams(0);
     onOpenChange(false);
   };
 
@@ -307,80 +323,93 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                       <h3 className="font-bold text-lg">{selectedProduct.name}</h3>
                       <p className="text-primary font-bold text-xl">
                         {formatCurrency(selectedProduct.price)}
+                        {selectedProduct.isWeightBased && (
+                          <span className="text-sm font-normal text-muted-foreground"> /kg</span>
+                        )}
                       </p>
                     </div>
 
-                    {/* Addons */}
-                    {productAddons && productAddons.length > 0 && (
-                      <div className="space-y-4">
-                        {productAddons.map((group) => (
-                          <div key={group.id} className="border rounded-xl p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <div>
-                                <h4 className="font-semibold">{group.title}</h4>
-                                {group.subtitle && (
-                                  <p className="text-sm text-muted-foreground">{group.subtitle}</p>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {group.is_required && (
-                                  <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
-                                )}
-                                <Badge variant="outline" className="text-xs">
-                                  Máx: {group.max_selections}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              {group.options?.map((option) => {
-                                const isSelected = selectedAddons.some(a => a.optionId === option.id);
-                                return (
-                                  <label
-                                    key={option.id}
-                                    className={cn(
-                                      "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
-                                      isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+                    {selectedProduct.isWeightBased ? (
+                      <WeightSelector
+                        pricePerKg={selectedProduct.price}
+                        value={weightGrams}
+                        onChange={setWeightGrams}
+                      />
+                    ) : (
+                      <>
+                        {/* Addons */}
+                        {productAddons && productAddons.length > 0 && (
+                          <div className="space-y-4">
+                            {productAddons.map((group) => (
+                              <div key={group.id} className="border rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div>
+                                    <h4 className="font-semibold">{group.title}</h4>
+                                    {group.subtitle && (
+                                      <p className="text-sm text-muted-foreground">{group.subtitle}</p>
                                     )}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Checkbox
-                                        checked={isSelected}
-                                        onCheckedChange={() => handleAddonToggle(group, option)}
-                                      />
-                                      <span>{option.name}</span>
-                                    </div>
-                                    {option.price > 0 && (
-                                      <span className="text-sm font-medium text-primary">
-                                        +{formatCurrency(option.price)}
-                                      </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {group.is_required && (
+                                      <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
                                     )}
-                                  </label>
-                                );
-                              })}
-                            </div>
+                                    <Badge variant="outline" className="text-xs">
+                                      Máx: {group.max_selections}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  {group.options?.map((option) => {
+                                    const isSelected = selectedAddons.some(a => a.optionId === option.id);
+                                    return (
+                                      <label
+                                        key={option.id}
+                                        className={cn(
+                                          "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
+                                          isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+                                        )}
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <Checkbox
+                                            checked={isSelected}
+                                            onCheckedChange={() => handleAddonToggle(group, option)}
+                                          />
+                                          <span>{option.name}</span>
+                                        </div>
+                                        {option.price > 0 && (
+                                          <span className="text-sm font-medium text-primary">
+                                            +{formatCurrency(option.price)}
+                                          </span>
+                                        )}
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        )}
 
-                    {/* Quantity */}
-                    <div className="flex items-center justify-center gap-4">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setQuantity(quantity + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
+                        {/* Quantity */}
+                        <div className="flex items-center justify-center gap-4">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                          <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setQuantity(quantity + 1)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
 
                     {/* Observation */}
                     <Textarea
@@ -408,6 +437,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                           setSelectedAddons([]);
                           setQuantity(1);
                           setObservation('');
+                          setWeightGrams(0);
                         }}
                       >
                         <ArrowLeft className="h-4 w-4 mr-1" />
@@ -415,6 +445,7 @@ export function QuickSaleModal({ open, onOpenChange, onCheckout }: QuickSaleModa
                       </Button>
                       <Button
                         className="flex-1"
+                        disabled={selectedProduct.isWeightBased && weightGrams <= 0}
                         onClick={() => {
                           handleAddToCart();
                           if (isMobile) setMobileView('cart');

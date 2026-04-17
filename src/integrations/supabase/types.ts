@@ -738,10 +738,12 @@ export type Database = {
           category_id: string | null
           created_at: string
           description: string | null
+          hide_from_catalog: boolean
           id: string
           image_url: string | null
           is_available: boolean
           is_featured: boolean
+          is_weight_based: boolean
           name: string
           price: number
           restaurant_id: string | null
@@ -751,10 +753,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           description?: string | null
+          hide_from_catalog?: boolean
           id?: string
           image_url?: string | null
           is_available?: boolean
           is_featured?: boolean
+          is_weight_based?: boolean
           name: string
           price?: number
           restaurant_id?: string | null
@@ -764,10 +768,12 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           description?: string | null
+          hide_from_catalog?: boolean
           id?: string
           image_url?: string | null
           is_available?: boolean
           is_featured?: boolean
+          is_weight_based?: boolean
           name?: string
           price?: number
           restaurant_id?: string | null

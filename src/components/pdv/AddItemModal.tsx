@@ -16,6 +16,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useTableOrderMutations } from '@/hooks/useTableOrders';
 import { useProductAddons, AddonGroup, AddonOption } from '@/hooks/useAddons';
+import { WeightSelector } from './WeightSelector';
 import { cn } from '@/lib/utils';
 
 interface AddItemModalProps {
@@ -39,10 +40,12 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     id: string;
     name: string;
     price: number;
+    isWeightBased: boolean;
   } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [observation, setObservation] = useState('');
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
+  const [weightGrams, setWeightGrams] = useState(0);
 
   const { data: products, isLoading: loadingProducts } = useProducts();
   const { data: categories } = useCategories();
@@ -70,8 +73,11 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
 
   const currentItemTotal = useMemo(() => {
     if (!selectedProduct) return 0;
+    if (selectedProduct.isWeightBased) {
+      return Math.round((weightGrams / 1000) * selectedProduct.price * 100) / 100;
+    }
     return (selectedProduct.price + addonsTotal) * quantity;
-  }, [selectedProduct, addonsTotal, quantity]);
+  }, [selectedProduct, addonsTotal, quantity, weightGrams]);
 
   const handleAddonToggle = (group: AddonGroup & { options: AddonOption[] }, option: AddonOption) => {
     setSelectedAddons(prev => {
@@ -112,26 +118,43 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     if (!selectedProduct) return;
 
     try {
-      // Build observation with addons
-      const addonsText = selectedAddons.length > 0
-        ? selectedAddons.map(a => a.optionName).join(', ')
-        : '';
-      const fullObservation = [addonsText, observation].filter(Boolean).join(' - ');
+      if (selectedProduct.isWeightBased) {
+        if (weightGrams <= 0) return;
+        const weightLabel = weightGrams >= 1000
+          ? `${(weightGrams / 1000).toFixed(weightGrams % 1000 === 0 ? 0 : 2).replace('.', ',')}kg`
+          : `${weightGrams}g`;
+        const weightObservation = [`Peso: ${weightLabel}`, observation].filter(Boolean).join(' - ');
+        await addItem.mutateAsync({
+          orderId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name,
+          quantity: 1,
+          unitPrice: currentItemTotal,
+          observation: weightObservation,
+        });
+      } else {
+        // Build observation with addons
+        const addonsText = selectedAddons.length > 0
+          ? selectedAddons.map(a => a.optionName).join(', ')
+          : '';
+        const fullObservation = [addonsText, observation].filter(Boolean).join(' - ');
 
-      await addItem.mutateAsync({
-        orderId,
-        productId: selectedProduct.id,
-        productName: selectedProduct.name,
-        quantity,
-        unitPrice: selectedProduct.price + addonsTotal,
-        observation: fullObservation || undefined,
-      });
+        await addItem.mutateAsync({
+          orderId,
+          productId: selectedProduct.id,
+          productName: selectedProduct.name,
+          quantity,
+          unitPrice: selectedProduct.price + addonsTotal,
+          observation: fullObservation || undefined,
+        });
+      }
 
       // Reset and close
       setSelectedProduct(null);
       setQuantity(1);
       setObservation('');
       setSelectedAddons([]);
+      setWeightGrams(0);
       onOpenChange(false);
     } catch (error) {
       // Error handled by mutation
@@ -143,8 +166,10 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
       id: product.id,
       name: product.name,
       price: Number(product.price),
+      isWeightBased: !!product.is_weight_based,
     });
     setSelectedAddons([]);
+    setWeightGrams(0);
   };
 
   const handleBack = () => {
@@ -152,6 +177,7 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
     setSelectedAddons([]);
     setQuantity(1);
     setObservation('');
+    setWeightGrams(0);
   };
 
   return (
@@ -244,80 +270,94 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
                 <h3 className="font-bold text-lg">{selectedProduct.name}</h3>
                 <p className="text-primary font-bold text-xl">
                   {formatCurrency(selectedProduct.price)}
+                  {selectedProduct.isWeightBased && (
+                    <span className="text-sm font-normal text-muted-foreground"> /kg</span>
+                  )}
                 </p>
               </div>
 
-              {/* Addons */}
-              {productAddons && productAddons.length > 0 && (
-                <div className="space-y-4">
-                  {productAddons.map((group) => (
-                    <div key={group.id} className="border rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <h4 className="font-semibold">{group.title}</h4>
-                          {group.subtitle && (
-                            <p className="text-sm text-muted-foreground">{group.subtitle}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {group.is_required && (
-                            <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
-                          )}
-                          <Badge variant="outline" className="text-xs">
-                            Máx: {group.max_selections}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        {group.options?.map((option) => {
-                          const isSelected = selectedAddons.some(a => a.optionId === option.id);
-                          return (
-                            <label
-                              key={option.id}
-                              className={cn(
-                                "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
-                                isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+              {/* Weight selector for weight-based products */}
+              {selectedProduct.isWeightBased ? (
+                <WeightSelector
+                  pricePerKg={selectedProduct.price}
+                  value={weightGrams}
+                  onChange={setWeightGrams}
+                />
+              ) : (
+                <>
+                  {/* Addons */}
+                  {productAddons && productAddons.length > 0 && (
+                    <div className="space-y-4">
+                      {productAddons.map((group) => (
+                        <div key={group.id} className="border rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h4 className="font-semibold">{group.title}</h4>
+                              {group.subtitle && (
+                                <p className="text-sm text-muted-foreground">{group.subtitle}</p>
                               )}
-                            >
-                              <div className="flex items-center gap-3">
-                                <Checkbox
-                                  checked={isSelected}
-                                  onCheckedChange={() => handleAddonToggle(group, option)}
-                                />
-                                <span>{option.name}</span>
-                              </div>
-                              {option.price > 0 && (
-                                <span className="text-sm font-medium text-primary">
-                                  +{formatCurrency(option.price)}
-                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {group.is_required && (
+                                <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
                               )}
-                            </label>
-                          );
-                        })}
-                      </div>
+                              <Badge variant="outline" className="text-xs">
+                                Máx: {group.max_selections}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {group.options?.map((option) => {
+                              const isSelected = selectedAddons.some(a => a.optionId === option.id);
+                              return (
+                                <label
+                                  key={option.id}
+                                  className={cn(
+                                    "flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors",
+                                    isSelected ? "border-primary bg-primary/5" : "hover:bg-muted"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Checkbox
+                                      checked={isSelected}
+                                      onCheckedChange={() => handleAddonToggle(group, option)}
+                                    />
+                                    <span>{option.name}</span>
+                                  </div>
+                                  {option.price > 0 && (
+                                    <span className="text-sm font-medium text-primary">
+                                      +{formatCurrency(option.price)}
+                                    </span>
+                                  )}
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
+                  )}
 
-              {/* Quantity */}
-              <div className="flex items-center justify-center gap-4">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+                  {/* Quantity */}
+                  <div className="flex items-center justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQuantity(quantity + 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
 
               {/* Observation */}
               <Textarea
@@ -333,7 +373,7 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
                 <p className="text-2xl font-bold text-primary">
                   {formatCurrency(currentItemTotal)}
                 </p>
-                {addonsTotal > 0 && (
+                {!selectedProduct.isWeightBased && addonsTotal > 0 && (
                   <p className="text-xs text-muted-foreground mt-1">
                     (Produto: {formatCurrency(selectedProduct.price * quantity)} + Adicionais: {formatCurrency(addonsTotal * quantity)})
                   </p>
@@ -352,7 +392,7 @@ export function AddItemModal({ orderId, open, onOpenChange }: AddItemModalProps)
                 <Button
                   className="flex-1"
                   onClick={handleAddItem}
-                  disabled={addItem.isPending}
+                  disabled={addItem.isPending || (selectedProduct.isWeightBased && weightGrams <= 0)}
                 >
                   {addItem.isPending ? 'Adicionando...' : 'Adicionar'}
                 </Button>
